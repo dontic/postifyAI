@@ -193,30 +193,30 @@ def main():
             with st.form("serp_params_form"):
                 serp_api_key = st.text_input(
                     "API Key",
-                    value=serp_params.get("API_KEY"),
+                    value=serp_params.get("api_key"),
                     type="password",
                 )
                 serp_location = st.text_input(
                     "Location",
-                    value=serp_params.get("LOCATION"),
+                    value=serp_params.get("location"),
                 )
                 serp_language = st.text_input(
-                    "Language", value=serp_params.get("LANGUAGE")
+                    "Language", value=serp_params.get("language")
                 )
                 serp_country = st.text_input(
-                    "Country", value=serp_params.get("COUNTRY")
+                    "Country", value=serp_params.get("country")
                 )
                 serp_max_results = st.number_input(
-                    "MAX_RESULTS", value=serp_params.get("MAX_RESULTS")
+                    "Max Results", value=serp_params.get("max_results")
                 )
 
                 if st.form_submit_button("Save SerpAPI Parameters"):
                     serp_params = {
-                        "API_KEY": serp_api_key,
-                        "LOCATION": serp_location,
-                        "LANGUAGE": serp_language,
-                        "COUNTRY": serp_country,
-                        "MAX_RESULTS": serp_max_results,
+                        "api_key": serp_api_key,
+                        "location": serp_location,
+                        "language": serp_language,
+                        "country": serp_country,
+                        "max_results": serp_max_results,
                     }
                     param_config["serp_params"] = serp_params
                     save_config("param_config", param_config)

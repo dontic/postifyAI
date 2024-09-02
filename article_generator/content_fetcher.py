@@ -12,6 +12,9 @@ def fetch_content(url):
 
         if body:
             content_body = body.get_text(separator="\n", strip=True)
+
+            # Truncate the content to 3000 characters
+            content_body = content_body[:3000]
         else:
             content_body = ""
     except Exception as e:

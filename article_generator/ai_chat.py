@@ -34,7 +34,6 @@ class AI:
         self.temperature = config["temperature"]
         self.max_retries = config["max_retries"]
         self.default_model = config["default_model"]
-        self.max_prompt_length = config["max_prompt_length"]
 
         # Initialize the conversation
         self.conversation = [
@@ -95,7 +94,7 @@ class AI:
                 # Handle general API errors
 
                 if attempt == self.max_retries:
-                    return None, None, "Max retries reached for API error."
+                    return "Max retries reached for API error."
 
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
@@ -120,7 +119,6 @@ class AI:
         self.temperature = config["temperature"]
         self.max_retries = config["max_retries"]
         self.default_model = config["default_model"]
-        self.max_prompt_length = config["max_prompt_length"]
 
         self.system = system_prompt
 
@@ -178,7 +176,7 @@ class AI:
                 # Handle general API errors
 
                 if attempt == self.max_retries:
-                    return None, None, "Max retries reached for API error."
+                    return "Max retries reached for API error."
 
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
@@ -188,7 +186,7 @@ class AI:
                 raise
 
         # Get the content of the response
-        content = response.content
+        content = response.content[0].text
 
         # Append the response to the messages list
         self.conversation.append({"role": "assistant", "content": content})
@@ -203,10 +201,12 @@ class AI:
         retry_delay: int = 5,
     ) -> str:
         if self.ai_provider == "openai":
-            return self.openai_chat(
+            response = self.openai_chat(
                 message, model=model, temperature=temperature, retry_delay=retry_delay
             )
+            return response
         elif self.ai_provider == "claude":
-            return self.claude_chat(
+            response = self.claude_chat(
                 message, model=model, temperature=temperature, retry_delay=retry_delay
             )
+            return response

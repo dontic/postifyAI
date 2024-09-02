@@ -1,0 +1,49 @@
+// devcontainer.json
+{
+    "name": "Python Devcontainer", // Name of the development container
+    "shutdownAction": "stopCompose", // Container behavior on VSCode close: none, stopContainer (default for image or Dockerfile), and stopCompose (default for Docker Compose)
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "python",
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+    // Extensions and settings
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "mhutchie.git-graph",
+                "GitHub.copilot",
+                "stackbreak.comment-divider",
+                "stuart.unique-window-colors",
+                "ms-python.black-formatter"
+            ],
+            "settings": {
+                // Black formatter settings
+                "editor.formatOnSave": true,
+                "notebook.formatOnSave.enabled": true,
+                "editor.defaultFormatter": "ms-python.black-formatter",
+                "[python]": {
+                    "editor.defaultFormatter": "ms-python.black-formatter"
+                },
+                // Window colors
+                "workbench.colorCustomizations": {
+                    "activityBar.background": "#ff4d00",
+                    "titleBar.activeBackground": "#ff4d00",
+                    "titleBar.activeForeground": "#FBFBF6"
+                },
+                // Prevent json schema warnings
+                "json.schemas": [
+                    {
+                        "fileMatch": [
+                            "/package.json"
+                        ],
+                        "url": "https://json.schemastore.org/package",
+                        "schema": true
+                    }
+                ]
+            }
+        }
+    },
+    "mounts": [
+        "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
+    ]
+}

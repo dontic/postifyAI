@@ -24,10 +24,10 @@
         "CLAUDE_DEFAULT_MODEL": "claude-3-5-sonnet-20240620"
     },
     "serp_params": {
-        "SERP_API_KEY": "abcde12345",
-        "SERP_LOCATION": "Austin, Texas",
-        "SERP_LANGUAGE": "en",
-        "SERP_COUNTRY": "us",
-        "SERP_MAX_RESULTS": 10
+        "API_KEY": "abcde12345",
+        "LOCATION": "Austin, Texas",
+        "LANGUAGE": "en",
+        "COUNTRY": "us",
+        "MAX_RESULTS": 10
     }
 }

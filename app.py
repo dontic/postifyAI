@@ -192,31 +192,31 @@ def main():
 
             with st.form("serp_params_form"):
                 serp_api_key = st.text_input(
-                    "SERP_API_KEY",
-                    value=serp_params.get("SERP_API_KEY"),
+                    "API Key",
+                    value=serp_params.get("API_KEY"),
                     type="password",
                 )
                 serp_location = st.text_input(
-                    "SERP_LOCATION",
-                    value=serp_params.get("SERP_LOCATION"),
+                    "Location",
+                    value=serp_params.get("LOCATION"),
                 )
                 serp_language = st.text_input(
-                    "SERP_LANGUAGE", value=serp_params.get("SERP_LANGUAGE")
+                    "Language", value=serp_params.get("LANGUAGE")
                 )
                 serp_country = st.text_input(
-                    "SERP_COUNTRY", value=serp_params.get("SERP_COUNTRY")
+                    "Country", value=serp_params.get("COUNTRY")
                 )
                 serp_max_results = st.number_input(
-                    "SERP_MAX_RESULTS", value=serp_params.get("SERP_MAX_RESULTS")
+                    "MAX_RESULTS", value=serp_params.get("MAX_RESULTS")
                 )
 
                 if st.form_submit_button("Save SerpAPI Parameters"):
                     serp_params = {
-                        "SERP_API_KEY": serp_api_key,
-                        "SERP_LOCATION": serp_location,
-                        "SERP_LANGUAGE": serp_language,
-                        "SERP_COUNTRY": serp_country,
-                        "SERP_MAX_RESULTS": serp_max_results,
+                        "API_KEY": serp_api_key,
+                        "LOCATION": serp_location,
+                        "LANGUAGE": serp_language,
+                        "COUNTRY": serp_country,
+                        "MAX_RESULTS": serp_max_results,
                     }
                     param_config["serp_params"] = serp_params
                     save_config("param_config", param_config)

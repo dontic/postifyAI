@@ -1,31 +1,5 @@
 import streamlit as st
-import json
-from pathlib import Path
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent
-
-# Data directory for docker volumes
-# Create if it doesn't exist
-DATA_DIR = BASE_DIR / "data"
-DATA_DIR.mkdir(exist_ok=True)
-
-
-# Function to save configurations
-def save_config(config_name, config_data):
-    config_path = DATA_DIR / f"{config_name}.json"
-    with open(config_path, "w") as f:
-        json.dump(config_data, f, indent=4, sort_keys=True)
-
-
-# Function to load configurations
-def load_config(config_name):
-    try:
-        config_path = DATA_DIR / f"{config_name}.json"
-        with open(config_path, "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return {}
+from utils.config_loader import save_config, load_config, create_config
 
 
 # Main app
@@ -41,7 +15,11 @@ def main():
         st.session_state.show_serp_params = False
 
     # Get or create the config
-    config = load_config("default_parameter_config")
+    param_config = load_config("param_config")
+    # Fallback if the config is empty
+    if not param_config:
+        create_config("param_config")
+        param_config = load_config("param_config")
 
     # Sidebar
     with st.sidebar:
@@ -51,7 +29,7 @@ def main():
         # ---------------------------------------------------------------------------- #
         st.title("Article Parameters")
 
-        article_params = config.get("article_params")
+        article_params = param_config.get("article_params")
 
         with st.form("article_params_form"):
 
@@ -89,7 +67,8 @@ def main():
                     "product_description": product_description,
                     "product_url": product_url,
                 }
-                save_config("article_params", article_params)
+                param_config["article_params"] = article_params
+                save_config("param_config", param_config)
                 st.success("Article parameters saved!")
 
         # ---------------------------------------------------------------------------- #
@@ -101,10 +80,10 @@ def main():
         ai_provider = st.selectbox(
             "Select AI Provider",
             ["OpenAI", "Claude"],
-            index=(0 if config.get("ai_provider") == "OpenAI" else 1),
+            index=(0 if param_config.get("ai_provider") == "OpenAI" else 1),
         )
-        config["ai_provider"] = ai_provider
-        save_config("config", config)
+        param_config["ai_provider"] = ai_provider
+        save_config("param_config", param_config)
 
         # ----------------------------- OpenAI Parameters ---------------------------- #
         if ai_provider == "OpenAI":
@@ -116,7 +95,7 @@ def main():
                 )
 
             if st.session_state.show_openai_params:
-                openai_params = config.get("openai_params")
+                openai_params = param_config.get("openai_params")
 
                 with st.form("openai_params_form"):
                     openai_api_key = st.text_input(
@@ -151,7 +130,8 @@ def main():
                             "OPENAI_MAX_RETRIES": openai_max_retries,
                             "OPENAI_DEFAULT_MODEL": openai_default_model,
                         }
-                        save_config("openai_params", openai_params)
+                        param_config["openai_params"] = openai_params
+                        save_config("param_config", param_config)
                         st.success("OpenAI parameters saved!")
 
         # --------------------------- Claude AI Parameters --------------------------- #
@@ -163,7 +143,7 @@ def main():
                 )
 
             if st.session_state.show_claude_params:
-                claude_params = config.get("claude_params")
+                claude_params = param_config.get("claude_params")
 
                 with st.form("claude_params_form"):
                     claude_api_key = st.text_input(
@@ -198,7 +178,8 @@ def main():
                             "CLAUDE_MAX_RETRIES": claude_max_retries,
                             "CLAUDE_DEFAULT_MODEL": claude_default_model,
                         }
-                        save_config("claude_params", claude_params)
+                        param_config["claude_params"] = claude_params
+                        save_config("param_config", param_config)
                         st.success("Claude AI parameters saved!")
 
         # ---------------------------- SerpAPI Parameters ---------------------------- #
@@ -207,7 +188,7 @@ def main():
             st.session_state.show_serp_params = not st.session_state.show_serp_params
 
         if st.session_state.show_serp_params:
-            serp_params = config.get("serp_params")
+            serp_params = param_config.get("serp_params")
 
             with st.form("serp_params_form"):
                 serp_api_key = st.text_input(
@@ -237,7 +218,8 @@ def main():
                         "SERP_COUNTRY": serp_country,
                         "SERP_MAX_RESULTS": serp_max_results,
                     }
-                    save_config("serp_params", serp_params)
+                    param_config["serp_params"] = serp_params
+                    save_config("param_config", param_config)
                     st.success("SerpAPI parameters saved!")
 
     # ---------------------------------------------------------------------------- #

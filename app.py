@@ -28,42 +28,6 @@ def load_config(config_name):
         return {}
 
 
-# Declare default configuration
-default_config = {
-    "article_params": {
-        "language": "English",
-        "article_type": "Guide",
-        "expertise_field": "SEO & Marketing",
-        "keyphrase": "How to write SEO articles for my landing page",
-        "product_name": "ContentCraftAI",
-        "product_description": "A powerful AI tool to generate SEO optimized articles for your website",
-        "product_url": "https://github.com/dontic/ai-seo-blog",
-    },
-    "ai_provider": "OpenAI",
-    "openai_params": {
-        "OPENAI_API_KEY": "sk-proj-12345",
-        "OPENAI_MAX_TOKENS": 5000,
-        "OPENAI_TEMPERATURE": 0.9,
-        "OPENAI_MAX_RETRIES": 3,
-        "OPENAI_DEFAULT_MODEL": "gpt-3.5-turbo",
-    },
-    "claude_params": {
-        "CLAUDE_API_KEY": "sk-ant-12345",
-        "CLAUDE_MAX_TOKENS": 5000,
-        "CLAUDE_TEMPERATURE": 0.9,
-        "CLAUDE_MAX_RETRIES": 3,
-        "CLAUDE_DEFAULT_MODEL": "claude-3-5-sonnet-20240620",
-    },
-    "serp_params": {
-        "SERP_API_KEY": "abcde12345",
-        "SERP_LOCATION": "Austin, Texas",
-        "SERP_LANGUAGE": "en",
-        "SERP_COUNTRY": "us",
-        "SERP_MAX_RESULTS": 10,
-    },
-}
-
-
 # Main app
 def main():
     st.set_page_config(page_title="SEO Article Generator", layout="wide")
@@ -78,9 +42,6 @@ def main():
 
     # Get or create the config
     config = load_config("config")
-    if not config:
-        save_config("config", default_config)
-        config = default_config
 
     # Sidebar
     with st.sidebar:

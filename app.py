@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.config_loader import save_config, load_config, create_config
+from article_generator.article_generator import ArticleGenerator
 
 
 # Main app
@@ -36,8 +37,8 @@ def main():
             language = st.text_input("Language", value=article_params.get("language"))
             article_type = st.selectbox(
                 "Type of article",
-                ["Guide", "Informational"],
-                index=(0 if article_params.get("article_type") == "Guide" else 1),
+                ["guide"],
+                index=0,
             )
             expertise_field = st.text_input(
                 "Expertise field",
@@ -235,7 +236,7 @@ def main():
     if st.button("GENERATE", key="generate_button"):
         # Here you would call your article generation function
         # For now, we'll just update the output text area with a placeholder
-        st.session_state.generated_text = "Here is your generated article...\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+        st.session_state.generated_text = ArticleGenerator().generate()
 
     # Text area for output
     st.text_area(

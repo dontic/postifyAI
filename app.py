@@ -79,7 +79,7 @@ def main():
         # ----------------------------- AI Model Selector ---------------------------- #
         ai_provider = st.selectbox(
             "Select AI Provider",
-            ["OpenAI", "Claude"],
+            ["openai", "claude"],
             index=(0 if param_config.get("ai_provider") == "OpenAI" else 1),
         )
         param_config["ai_provider"] = ai_provider
@@ -99,36 +99,36 @@ def main():
 
                 with st.form("openai_params_form"):
                     openai_api_key = st.text_input(
-                        "OPENAI_API_KEY",
-                        value=openai_params.get("OPENAI_API_KEY"),
+                        "API Key",
+                        value=openai_params.get("api_key"),
                         type="password",
                     )
                     openai_max_tokens = st.number_input(
-                        "OPENAI_MAX_TOKENS",
-                        value=openai_params.get("OPENAI_MAX_TOKENS"),
+                        "Max Tokens",
+                        value=openai_params.get("max_tokens"),
                     )
                     openai_temperature = st.slider(
-                        "OPENAI_TEMPERATURE",
+                        "Temperature",
                         0.0,
                         1.0,
-                        openai_params.get("OPENAI_TEMPERATURE"),
+                        openai_params.get("temperature"),
                     )
                     openai_max_retries = st.number_input(
-                        "OPENAI_MAX_RETRIES",
-                        value=openai_params.get("OPENAI_MAX_RETRIES"),
+                        "Max Retries",
+                        value=openai_params.get("max_retries"),
                     )
                     openai_default_model = st.text_input(
-                        "OPENAI_DEFAULT_MODEL",
-                        value=openai_params.get("OPENAI_DEFAULT_MODEL"),
+                        "Default Model",
+                        value=openai_params.get("default_model"),
                     )
 
                     if st.form_submit_button("Save OpenAI Parameters"):
                         openai_params = {
-                            "OPENAI_API_KEY": openai_api_key,
-                            "OPENAI_MAX_TOKENS": openai_max_tokens,
-                            "OPENAI_TEMPERATURE": openai_temperature,
-                            "OPENAI_MAX_RETRIES": openai_max_retries,
-                            "OPENAI_DEFAULT_MODEL": openai_default_model,
+                            "api_key": openai_api_key,
+                            "max_tokens": openai_max_tokens,
+                            "temperature": openai_temperature,
+                            "max_retries": openai_max_retries,
+                            "default_model": openai_default_model,
                         }
                         param_config["openai_params"] = openai_params
                         save_config("param_config", param_config)
@@ -147,36 +147,36 @@ def main():
 
                 with st.form("claude_params_form"):
                     claude_api_key = st.text_input(
-                        "CLAUDE_API_KEY",
-                        value=claude_params.get("CLAUDE_API_KEY"),
+                        "API Key",
+                        value=claude_params.get("api_key"),
                         type="password",
                     )
                     claude_max_tokens = st.number_input(
-                        "CLAUDE_MAX_TOKENS",
-                        value=claude_params.get("CLAUDE_MAX_TOKENS"),
+                        "Max Tokens",
+                        value=claude_params.get("max_tokens"),
                     )
                     claude_temperature = st.slider(
-                        "CLAUDE_TEMPERATURE",
+                        "Temperature",
                         0.0,
                         1.0,
-                        claude_params.get("CLAUDE_TEMPERATURE"),
+                        claude_params.get("temperature"),
                     )
                     claude_max_retries = st.number_input(
-                        "CLAUDE_MAX_RETRIES",
-                        value=claude_params.get("CLAUDE_MAX_RETRIES"),
+                        "Max Retries",
+                        value=claude_params.get("max_retries"),
                     )
                     claude_default_model = st.text_input(
-                        "CLAUDE_DEFAULT_MODEL",
-                        value=claude_params.get("CLAUDE_DEFAULT_MODEL"),
+                        "Default Model",
+                        value=claude_params.get("default_model"),
                     )
 
                     if st.form_submit_button("Save Claude AI Parameters"):
                         claude_params = {
-                            "CLAUDE_API_KEY": claude_api_key,
-                            "CLAUDE_MAX_TOKENS": claude_max_tokens,
-                            "CLAUDE_TEMPERATURE": claude_temperature,
-                            "CLAUDE_MAX_RETRIES": claude_max_retries,
-                            "CLAUDE_DEFAULT_MODEL": claude_default_model,
+                            "api_key": claude_api_key,
+                            "max_tokens": claude_max_tokens,
+                            "temperature": claude_temperature,
+                            "max_retries": claude_max_retries,
+                            "default_model": claude_default_model,
                         }
                         param_config["claude_params"] = claude_params
                         save_config("param_config", param_config)

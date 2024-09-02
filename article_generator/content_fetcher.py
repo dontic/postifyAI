@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 
 
-def fetch_content(url):
+def fetch_content(url: str) -> str:
     # Fetch content from the URL
     try:
         response = requests.get(url, timeout=30)
@@ -21,7 +21,7 @@ def fetch_content(url):
     return content_body
 
 
-def fetch_all_contents(urls):
+def fetch_all_contents(urls: list[str]) -> list[str]:
     # Fetch content from multiple URLs
     contents = [fetch_content(url) for url in urls]
 

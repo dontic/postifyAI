@@ -41,7 +41,7 @@ def main():
         st.session_state.show_serp_params = False
 
     # Get or create the config
-    config = load_config("config")
+    config = load_config("default_parameter_config")
 
     # Sidebar
     with st.sidebar:

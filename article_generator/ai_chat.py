@@ -14,8 +14,20 @@ from anthropic import (
 from utils.config_loader import load_config
 
 
-class OpenAIChat:
-    def __init__(self, system_prompt: str):
+class AI:
+    def __init__(self, system_prompt):
+
+        # Load the param_config.json file
+        self.ai_provider = load_config("param_config")["ai_provider"]
+
+        if self.ai_provider == "openai":
+            self.openai_init(system_prompt)
+        elif self.ai_provider == "claude":
+            self.claude_init(system_prompt)
+        else:
+            raise ValueError("Invalid AI provider")
+
+    def openai_init(self, system_prompt: str):
         config = load_config("param_config")["openai_params"]
         self.api_key = config["api_key"]
         self.max_tokens = config["max_tokens"]
@@ -32,7 +44,7 @@ class OpenAIChat:
         # Setup the Open AI client
         self.client = OpenAI(api_key=self.api_key)
 
-    def chat(
+    def openai_chat(
         self,
         message: str,
         model: str = None,
@@ -100,9 +112,7 @@ class OpenAIChat:
 
         return content
 
-
-class ClaudeChat:
-    def __init__(self, system_prompt):
+    def claude_init(self, system_prompt):
         config = load_config("param_config")["claude_params"]
         self.conversation = []
         self.api_key = config["api_key"]
@@ -117,7 +127,7 @@ class ClaudeChat:
         # Setup the Claude client
         self.client = Anthropic(api_key=self.api_key)
 
-    def chat(
+    def claude_chat(
         self,
         message: str,
         model: str = None,
@@ -185,16 +195,18 @@ class ClaudeChat:
 
         return content
 
-
-class AI:
-    def __init__(self, system_prompt):
-
-        # Load the param_config.json file
-        ai_provider = load_config("param_config")["ai_provider"]
-
-        if ai_provider == "openai":
-            self.chatbot = OpenAIChat(system_prompt)
-        elif ai_provider == "claude":
-            self.chatbot = ClaudeChat(system_prompt)
-        else:
-            raise ValueError("Invalid AI provider")
+    def chat(
+        self,
+        message: str,
+        model: str = None,
+        temperature: float = None,
+        retry_delay: int = 5,
+    ) -> str:
+        if self.ai_provider == "openai":
+            return self.openai_chat(
+                message, model=model, temperature=temperature, retry_delay=retry_delay
+            )
+        elif self.ai_provider == "claude":
+            return self.claude_chat(
+                message, model=model, temperature=temperature, retry_delay=retry_delay
+            )

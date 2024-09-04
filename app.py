@@ -2,6 +2,9 @@ import streamlit as st
 from utils.config_loader import save_config, load_config
 from article_generator.article_generator import ArticleGenerator
 
+from time import sleep
+from stqdm import stqdm
+
 
 # Main app
 def main():
@@ -295,8 +298,15 @@ def main():
 
     # If the generation process is in progress
     if st.session_state.generating and not st.session_state.generation_complete:
-        with st.spinner("Generating article... This might take a couple of minutes."):
-            text, error = ArticleGenerator().generate()
+
+        progress_text = "Operation in progress. Please wait."
+        progress_bar = st.progress(0, text=progress_text)
+
+        with st.status("Generating article...", expanded=True) as status:
+
+            text, error = ArticleGenerator().generate(progress_bar)
+
+            status.update(label="Article generated!", state="complete", expanded=True)
 
             st.session_state.generated_text = text
             st.session_state.generation_error = error

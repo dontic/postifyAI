@@ -83,7 +83,7 @@ def main():
         save_config("param_config", param_config)
 
         # ----------------------------- OpenAI Parameters ---------------------------- #
-        if ai_provider == "OpenAI":
+        if ai_provider == "openai":
 
             # Toggle OpenAI Parameters button
             if st.button("OpenAI Parameters"):
@@ -132,7 +132,7 @@ def main():
                         st.success("OpenAI parameters saved!")
 
         # --------------------------- Claude AI Parameters --------------------------- #
-        else:
+        elif ai_provider == "claude":
             # Toggle Claude AI Parameters button
             if st.button("Claude AI Parameters"):
                 st.session_state.show_claude_params = (
@@ -178,6 +178,9 @@ def main():
                         param_config["claude_params"] = claude_params
                         save_config("param_config", param_config)
                         st.success("Claude AI parameters saved!")
+
+        else:
+            st.error("Please select a valid AI provider")
 
         # ---------------------------- SerpAPI Parameters ---------------------------- #
         # Toggle SerpAPI Parameters button

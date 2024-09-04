@@ -302,11 +302,14 @@ def main():
     # If the generation process is in progress
     if st.session_state.generating and not st.session_state.generation_complete:
         with st.spinner("Generating article... This might take a couple of minutes."):
-            st.session_state.generated_text, st.session_state.generation_error = (
-                asyncio.run(generate_article_async())
-            )
+            text, error = asyncio.run(generate_article_async())
+
+            st.session_state.generated_text = text
+            st.session_state.generation_error = error
+
             st.session_state.generating = False
             st.session_state.generation_complete = True
+
             st.rerun()
 
     # If the generation process is not in progress and there wasn't a previous generation

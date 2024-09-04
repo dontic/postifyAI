@@ -1,7 +1,7 @@
 # article_generator.py
 
 from article_generator.ai_chat import AI
-from utils.config_loader import load_config, create_config
+from utils.config_loader import load_config
 from article_generator import serp_api, content_fetcher, summarizer
 
 
@@ -21,10 +21,6 @@ class ArticleGenerator:
 
         # Load the AI steps for the type of article
         self.ai_prompts = load_config("prompt_config")
-        # Fallback for the prompt_config being empty
-        if not self.ai_prompts:
-            create_config("prompt_config")
-            self.ai_prompts = load_config("prompt_config")
 
         # Load the prompt config for the article type
         self.ai_prompts = self.ai_prompts[self.article_type]

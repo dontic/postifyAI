@@ -11,27 +11,30 @@ load_dotenv()
 def setup_logger(name: str) -> logging.Logger:
     # Create logger
     logger = logging.getLogger(name)
-    logger.setLevel(
-        logging.DEBUG if os.getenv("LOGGING_DEBUG") == "True" else logging.INFO
-    )
 
-    # Create console handler and set level to debug
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.DEBUG)
+    # Only add handler if the logger doesn't already have handlers
+    if not logger.handlers:
+        logger.setLevel(
+            logging.DEBUG if os.getenv("LOGGING_DEBUG") == "True" else logging.INFO
+        )
 
-    # Create formatter
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+        # Create console handler and set level to debug
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setLevel(logging.DEBUG)
 
-    # Add formatter to console handler
-    console_handler.setFormatter(formatter)
+        # Create formatter
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
 
-    # Add console handler to logger
-    logger.addHandler(console_handler)
+        # Add formatter to console handler
+        console_handler.setFormatter(formatter)
 
-    # Prevent the log messages from being duplicated in the root logger
-    logger.propagate = False
+        # Add console handler to logger
+        logger.addHandler(console_handler)
+
+        # Prevent the log messages from being duplicated in the root logger
+        logger.propagate = False
 
     return logger
 

@@ -236,6 +236,8 @@ def main():
         st.session_state.generating = False
     if "generation_complete" not in st.session_state:
         st.session_state.generation_complete = False
+    if "generation_error" not in st.session_state:
+        st.session_state.generation_error = None
 
     async def generate_article_async():
         return ArticleGenerator().generate()
@@ -248,7 +250,9 @@ def main():
 
     if st.session_state.generating and not st.session_state.generation_complete:
         with st.spinner("Generating article... This might take a couple of minutes."):
-            st.session_state.generated_text = asyncio.run(generate_article_async())
+            st.session_state.generated_text, st.session_state.generation_error = (
+                asyncio.run(generate_article_async())
+            )
             st.session_state.generating = False
             st.session_state.generation_complete = True
             st.rerun()
@@ -267,7 +271,16 @@ def main():
 
         # Display generation status
         if st.session_state.generation_complete:
-            st.success("Article generated successfully!")
+            if st.session_state.generation_error:
+                st.error(
+                    f"""
+Error generating article!
+
+{st.session_state.generation_error}
+"""
+                )
+            else:
+                st.success("Article generated successfully!")
 
         # Buttons for actions
         col1, col2, col3 = st.columns(3)

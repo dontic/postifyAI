@@ -38,12 +38,17 @@ class ArticleGenerator:
 
         print("Article Generator Initialized.")
 
-    def generate(self):
+    def generate(self) -> tuple[str, str | None]:
         print("Generating Article...")
 
         # Get the top urls from the search engine
         print(f"Getting top URLs for keyphrase: {self.keyphrase}")
-        urls = serp_api.get_google_search_top_urls(self.keyphrase)
+        urls, serpapi_error = serp_api.get_google_search_top_urls(self.keyphrase)
+
+        if serpapi_error:
+            print(f"Error getting SERP URLs: {serpapi_error}")
+            return "", f"Error getting SERP URLs:\n\n{serpapi_error}"
+
         print(f"Top URLs: {urls}")
 
         # Get the content from the top urls
@@ -97,4 +102,4 @@ class ArticleGenerator:
         # Combine the article parts into a single article
         full_article = "\n".join(full_article_list)
 
-        return full_article
+        return full_article, None

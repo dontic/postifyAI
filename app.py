@@ -77,7 +77,7 @@ def main():
         ai_provider = st.selectbox(
             "Select AI Provider",
             ["openai", "claude"],
-            index=(0 if param_config.get("ai_provider") == "OpenAI" else 1),
+            index=(0 if param_config.get("ai_provider") == "openai" else 1),
         )
         param_config["ai_provider"] = ai_provider
         save_config("param_config", param_config)

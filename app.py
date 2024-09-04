@@ -226,8 +226,6 @@ def main():
     # ---------------------------------------------------------------------------- #
     #                               Main content area                              #
     # ---------------------------------------------------------------------------- #
-    st.title("Generated Article")
-
     # Initialize session state for:
     # - The generated text
     # - Whether the article is being generated
@@ -255,33 +253,49 @@ def main():
             st.session_state.generation_complete = True
             st.rerun()
 
-    # Display generation status
-    if st.session_state.generation_complete:
-        st.success("Article generated successfully!")
-
-    # Buttons for actions
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
+    if not st.session_state.generation_complete:
         if st.button(
             "GENERATE" if not st.session_state.generation_complete else "REGENERATE",
             key="generate_button",
             disabled=st.session_state.generating,
+            use_container_width=True,
+            type="primary",
         ):
             st.session_state.generation_complete = False  # Reset
             start_generation()
+    else:
 
-    with col3:
-        if st.download_button(
-            "Download Markdown",
-            st.session_state.generated_text,
-            file_name="generated_article.md",
-            disabled=st.session_state.generating or not st.session_state.generated_text,
-        ):
-            st.write("Article downloaded!")
+        # Display generation status
+        if st.session_state.generation_complete:
+            st.success("Article generated successfully!")
 
-    # Display generated text
-    st.markdown(st.session_state.generated_text or "Your article will appear here...")
+        # Buttons for actions
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            if st.button(
+                "REGENERATE",
+                key="regenerate_button",
+                disabled=st.session_state.generating,
+                type="primary",
+            ):
+                st.session_state.generation_complete = False  # Reset
+                start_generation()
+
+        with col3:
+            if st.download_button(
+                "Download Markdown",
+                st.session_state.generated_text,
+                file_name="generated_article.md",
+                disabled=st.session_state.generating
+                or not st.session_state.generated_text,
+            ):
+                st.write("Article downloaded!")
+
+        # Display generated text
+        st.markdown(
+            st.session_state.generated_text or "Your article will appear here..."
+        )
 
 
 if __name__ == "__main__":

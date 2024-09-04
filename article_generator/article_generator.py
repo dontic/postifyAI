@@ -10,7 +10,7 @@ log = setup_logger(__name__)
 
 class ArticleGenerator:
     def __init__(self):
-        print("Initializing Article Generator...")
+        log.info("Initializing Article Generator...")
 
         # Load article_params from the param_config.json file
         self.article_params = load_config("param_config")["article_params"]
@@ -39,7 +39,7 @@ class ArticleGenerator:
             for step in self.ai_prompts["steps"]
         ]
 
-        print("Article Generator Initialized.")
+        log.info("Article Generator Initialized.")
 
     def generate(self) -> tuple[str, str | None]:
         log.info("Generating the article...")

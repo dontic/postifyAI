@@ -1,4 +1,3 @@
-import asyncio
 import streamlit as st
 from utils.config_loader import save_config, load_config
 from article_generator.article_generator import ArticleGenerator
@@ -288,11 +287,6 @@ def main():
     #                               Main content area                              #
     # ---------------------------------------------------------------------------- #
 
-    # Article generation coroutine
-    # This is needed to be fed into the asyncio.run() function
-    async def generate_article_async():
-        return ArticleGenerator().generate()
-
     def start_generation():
         if not st.session_state.generating:
             st.session_state.generating = True
@@ -302,7 +296,7 @@ def main():
     # If the generation process is in progress
     if st.session_state.generating and not st.session_state.generation_complete:
         with st.spinner("Generating article... This might take a couple of minutes."):
-            text, error = asyncio.run(generate_article_async())
+            text, error = ArticleGenerator().generate()
 
             st.session_state.generated_text = text
             st.session_state.generation_error = error

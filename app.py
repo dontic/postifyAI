@@ -32,7 +32,7 @@ def main():
 
             language = st.text_input("Language", value=article_params.get("language"))
             article_type = st.selectbox(
-                "Type of article",
+                "Type of article (More options coming soon)",
                 ["guide"],
                 index=0,
             )

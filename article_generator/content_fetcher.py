@@ -9,7 +9,7 @@ log = setup_logger(__name__)
 def fetch_content(url: str) -> str:
     # Fetch content from the URL
     try:
-        log.debug(f"Fetching content from {url}")
+        log.info(f"Fetching content from {url}")
 
         response = requests.get(url, timeout=30)
         response.raise_for_status()  # Raises an HTTPError if the status is 4xx, 5xx
@@ -34,9 +34,7 @@ def fetch_all_contents(urls: list[str]) -> tuple[list[str], str | None]:
     contents = [fetch_content(url) for url in urls]
 
     # Remove empty contents
-    log.debug("Removing empty contents...")
     contents = [content for content in contents if content]
-    log.debug(f"Removed {len(urls) - len(contents)} empty contents")
 
     log.info(f"Fetched {len(contents)} contents")
 

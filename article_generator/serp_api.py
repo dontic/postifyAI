@@ -14,7 +14,6 @@ def get_google_search_top_urls(query: str) -> tuple[list[str], str | None]:
     error = None
 
     # Initialize the serpapi client
-    log.debug("Initializing SerpApi client...")
     serpapi_client = serpapi.Client(api_key=serp_config["api_key"])
 
     # Try to get the search results
@@ -49,15 +48,11 @@ def get_google_search_top_urls(query: str) -> tuple[list[str], str | None]:
 
     organic_results = search_results.get("organic_results", [])
 
-    log.debug(f"Organic results: {organic_results}")
-
     log.info(
         f"Organic results filtered, getting the top {serp_config['max_results']} URLs..."
     )
 
     urls = [result["link"] for result in organic_results[: serp_config["max_results"]]]
-
-    log.debug(f"Top URLs: {urls}")
 
     log.info(f"Returning top {len(urls)} URLs")
 

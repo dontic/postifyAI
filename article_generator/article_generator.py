@@ -54,24 +54,29 @@ class ArticleGenerator:
 
         # Get the content from the top urls
         log.info("Fetching content from the top URLs...")
-        contents, error = content_fetcher.fetch_all_contents(urls)
-        if error:
-            log.error(f"Error fetching content: {error}")
-            return "", f"Error fetching content:\n\n{error}"
+        contents, content_fetching_error = content_fetcher.fetch_all_contents(urls)
+        if content_fetching_error:
+            log.error(f"Error fetching content: {content_fetching_error}")
+            return "", f"Error fetching content:\n\n{content_fetching_error}"
 
         log.info(f"Fetched {len(contents)} contents")
 
         # Summarize each content
         log.info("Summarizing the content...")
-        summaries = [summarizer.summarize_website(content) for content in contents]
+        summaries = []
+
+        for content in contents:
+            summary, summary_error = summarizer.summarize_website(content)
+            if summary_error:
+                log.error(f"Error summarizing content: {summary_error}")
+                return "", f"Error summarizing content:\n\n{summary_error}"
+            summaries.append(summary)
 
         # Combine all the summaries into one summary
         log.info(
             f"Summarized {len(summaries)} contents, generating a combined summary..."
         )
         combined_content_summary = summarizer.summarize_website("\n".join(summaries))
-
-        log.debug(f"Combined Content Summary: {combined_content_summary}")
 
         log.info("Content Summarized.")
 
@@ -86,7 +91,6 @@ class ArticleGenerator:
             product_url=self.product_url,
             combined_content_summary=combined_content_summary,
         )
-        log.debug(formatted_system_prompt)
 
         log.info("System Prompt populated.")
 
@@ -107,10 +111,8 @@ class ArticleGenerator:
                 product_url=self.product_url,
                 combined_content_summary=combined_content_summary,
             )
-            log.debug("Step Prompt:", step_prompt)
             response = ai_chat.chat(step_prompt)
             full_article_list.append(response)
-            log.debug("Response:", response)
 
         # Combine the article parts into a single article
         full_article = "\n".join(full_article_list)

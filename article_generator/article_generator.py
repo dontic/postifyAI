@@ -3,6 +3,9 @@
 from article_generator.ai_chat import AI
 from utils.config_loader import load_config
 from article_generator import serp_api, content_fetcher, summarizer
+from logging_setup import setup_logger
+
+log = setup_logger(__name__)
 
 
 class ArticleGenerator:
@@ -39,33 +42,37 @@ class ArticleGenerator:
         print("Article Generator Initialized.")
 
     def generate(self) -> tuple[str, str | None]:
-        print("Generating Article...")
+        log.info("Generating the article...")
 
         # Get the top urls from the search engine
-        print(f"Getting top URLs for keyphrase: {self.keyphrase}")
+        log.info(f"Getting top URLs for keyphrase: {self.keyphrase}")
         urls, serpapi_error = serp_api.get_google_search_top_urls(self.keyphrase)
 
         if serpapi_error:
-            print(f"Error getting SERP URLs: {serpapi_error}")
+            log.error(f"Error getting SERP URLs: {serpapi_error}")
             return "", f"Error getting SERP URLs:\n\n{serpapi_error}"
 
-        print(f"Top URLs: {urls}")
-
         # Get the content from the top urls
-        print("Fetching content from the top URLs...")
+        log.info("Fetching content from the top URLs...")
         contents = content_fetcher.fetch_all_contents(urls)
-        print(f"Fetched {len(contents)} contents")
+        log.info(f"Fetched {len(contents)} contents")
 
         # Summarize each content
-        print("Summarizing the content...")
+        log.info("Summarizing the content...")
         summaries = [summarizer.summarize_website(content) for content in contents]
 
         # Combine all the summaries into one summary
+        log.info(
+            f"Summarized {len(summaries)} contents, generating a combined summary..."
+        )
         combined_content_summary = summarizer.summarize_website("\n".join(summaries))
-        print(f"Combined Content Summary: {combined_content_summary}")
+
+        log.debug(f"Combined Content Summary: {combined_content_summary}")
+
+        log.info("Content Summarized.")
 
         # Populate the system prompt with the variables
-        print("Populating the system prompt...")
+        log.info("Populating the system prompt...")
         formatted_system_prompt = self.system_prompt.format(
             language=self.language,
             expertise_field=self.expertise_field,
@@ -75,12 +82,14 @@ class ArticleGenerator:
             product_url=self.product_url,
             combined_content_summary=combined_content_summary,
         )
-        print(formatted_system_prompt)
+        log.debug(formatted_system_prompt)
+
+        log.info("System Prompt populated.")
 
         # Initialize the AI chat
-        print("Initializing AI Chat...")
+        log.info("Initializing AI Chat...")
         ai_chat = AI(formatted_system_prompt)
-        print("AI Chat Initialized.")
+        log.info("AI Chat Initialized.")
 
         # Loop through the steps and generate the article
         full_article_list = []
@@ -94,10 +103,10 @@ class ArticleGenerator:
                 product_url=self.product_url,
                 combined_content_summary=combined_content_summary,
             )
-            print(step_prompt)
+            log.debug("Step Prompt:", step_prompt)
             response = ai_chat.chat(step_prompt)
             full_article_list.append(response)
-            print(response)
+            log.debug("Response:", response)
 
         # Combine the article parts into a single article
         full_article = "\n".join(full_article_list)

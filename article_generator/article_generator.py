@@ -54,7 +54,11 @@ class ArticleGenerator:
 
         # Get the content from the top urls
         log.info("Fetching content from the top URLs...")
-        contents = content_fetcher.fetch_all_contents(urls)
+        contents, error = content_fetcher.fetch_all_contents(urls)
+        if error:
+            log.error(f"Error fetching content: {error}")
+            return "", f"Error fetching content:\n\n{error}"
+
         log.info(f"Fetched {len(contents)} contents")
 
         # Summarize each content

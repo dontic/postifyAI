@@ -130,7 +130,8 @@ class ArticleGenerator:
                 log.error(f"Error processing step {index + 1}: {response_error}")
                 return "", f"Error processing step {index + 1}:\n\n{response_error}"
 
-            full_article_list.append(response)
+            if step["printout"]:
+                full_article_list.append(response)
 
         # Combine the article parts into a single article
         full_article = "\n".join(full_article_list)

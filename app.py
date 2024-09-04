@@ -8,15 +8,23 @@ from article_generator.article_generator import ArticleGenerator
 def main():
     st.set_page_config(page_title="SEO Article Generator", layout="wide")
 
-    # Initialize session state for form visibility
+    # -------------------- Initialize session state variables -------------------- #
     if "show_openai_params" not in st.session_state:
         st.session_state.show_openai_params = False
     if "show_claude_params" not in st.session_state:
         st.session_state.show_claude_params = False
     if "show_serp_params" not in st.session_state:
         st.session_state.show_serp_params = False
+    if "generated_text" not in st.session_state:
+        st.session_state.generated_text = ""
+    if "generating" not in st.session_state:
+        st.session_state.generating = False
+    if "generation_complete" not in st.session_state:
+        st.session_state.generation_complete = False
+    if "generation_error" not in st.session_state:
+        st.session_state.generation_error = None
 
-    # Get or create the config
+    # Get or create the param config when the app starts or re-runs
     param_config = load_config("param_config")
 
     # Sidebar
@@ -31,31 +39,47 @@ def main():
 
         with st.form("article_params_form"):
 
-            language = st.text_input("Language", value=article_params.get("language"))
+            language = st.text_input(
+                "Language",
+                value=article_params.get("language"),
+                disabled=st.session_state.generating,
+            )
             article_type = st.selectbox(
                 "Type of article (More options coming soon)",
                 ["guide"],
                 index=0,
+                disabled=st.session_state.generating,
             )
             expertise_field = st.text_input(
                 "Expertise field",
                 value=article_params.get("expertise_field"),
+                disabled=st.session_state.generating,
             )
             keyphrase = st.text_input(
-                "Keyphrase", value=article_params.get("keyphrase")
+                "Keyphrase",
+                value=article_params.get("keyphrase"),
+                disabled=st.session_state.generating,
             )
             product_name = st.text_input(
-                "Product name", value=article_params.get("product_name")
+                "Product name",
+                value=article_params.get("product_name"),
+                disabled=st.session_state.generating,
             )
             product_description = st.text_area(
                 "Product description",
                 value=article_params.get("product_description"),
+                disabled=st.session_state.generating,
             )
             product_url = st.text_input(
-                "Product URL", value=article_params.get("product_url")
+                "Product URL",
+                value=article_params.get("product_url"),
+                disabled=st.session_state.generating,
             )
 
-            if st.form_submit_button("Save Article Parameters"):
+            if st.form_submit_button(
+                "Save Article Parameters",
+                disabled=st.session_state.generating,
+            ):
                 article_params = {
                     "language": language,
                     "article_type": article_type,
@@ -79,6 +103,7 @@ def main():
             "Select AI Provider",
             ["openai", "claude"],
             index=(0 if param_config.get("ai_provider") == "openai" else 1),
+            disabled=st.session_state.generating,
         )
         param_config["ai_provider"] = ai_provider
         save_config("param_config", param_config)
@@ -87,7 +112,10 @@ def main():
         if ai_provider == "openai":
 
             # Toggle OpenAI Parameters button
-            if st.button("OpenAI Parameters"):
+            if st.button(
+                "OpenAI Parameters",
+                disabled=st.session_state.generating,
+            ):
                 st.session_state.show_openai_params = (
                     not st.session_state.show_openai_params
                 )
@@ -100,27 +128,35 @@ def main():
                         "API Key",
                         value=openai_params.get("api_key"),
                         type="password",
+                        disabled=st.session_state.generating,
                     )
                     openai_max_tokens = st.number_input(
                         "Max Tokens",
                         value=openai_params.get("max_tokens"),
+                        disabled=st.session_state.generating,
                     )
                     openai_temperature = st.slider(
                         "Temperature",
                         0.0,
                         1.0,
                         openai_params.get("temperature"),
+                        disabled=st.session_state.generating,
                     )
                     openai_max_retries = st.number_input(
                         "Max Retries",
                         value=openai_params.get("max_retries"),
+                        disabled=st.session_state.generating,
                     )
                     openai_default_model = st.text_input(
                         "Default Model",
                         value=openai_params.get("default_model"),
+                        disabled=st.session_state.generating,
                     )
 
-                    if st.form_submit_button("Save OpenAI Parameters"):
+                    if st.form_submit_button(
+                        "Save OpenAI Parameters",
+                        disabled=st.session_state.generating,
+                    ):
                         openai_params = {
                             "api_key": openai_api_key,
                             "max_tokens": openai_max_tokens,
@@ -135,7 +171,10 @@ def main():
         # --------------------------- Claude AI Parameters --------------------------- #
         elif ai_provider == "claude":
             # Toggle Claude AI Parameters button
-            if st.button("Claude AI Parameters"):
+            if st.button(
+                "Claude AI Parameters",
+                disabled=st.session_state.generating,
+            ):
                 st.session_state.show_claude_params = (
                     not st.session_state.show_claude_params
                 )
@@ -148,27 +187,35 @@ def main():
                         "API Key",
                         value=claude_params.get("api_key"),
                         type="password",
+                        disabled=st.session_state.generating,
                     )
                     claude_max_tokens = st.number_input(
                         "Max Tokens",
                         value=claude_params.get("max_tokens"),
+                        disabled=st.session_state.generating,
                     )
                     claude_temperature = st.slider(
                         "Temperature",
                         0.0,
                         1.0,
                         claude_params.get("temperature"),
+                        disabled=st.session_state.generating,
                     )
                     claude_max_retries = st.number_input(
                         "Max Retries",
                         value=claude_params.get("max_retries"),
+                        disabled=st.session_state.generating,
                     )
                     claude_default_model = st.text_input(
                         "Default Model",
                         value=claude_params.get("default_model"),
+                        disabled=st.session_state.generating,
                     )
 
-                    if st.form_submit_button("Save Claude AI Parameters"):
+                    if st.form_submit_button(
+                        "Save Claude AI Parameters",
+                        disabled=st.session_state.generating,
+                    ):
                         claude_params = {
                             "api_key": claude_api_key,
                             "max_tokens": claude_max_tokens,
@@ -185,7 +232,10 @@ def main():
 
         # ---------------------------- SerpAPI Parameters ---------------------------- #
         # Toggle SerpAPI Parameters button
-        if st.button("SerpAPI Parameters"):
+        if st.button(
+            "SerpAPI Parameters",
+            disabled=st.session_state.generating,
+        ):
             st.session_state.show_serp_params = not st.session_state.show_serp_params
 
         if st.session_state.show_serp_params:
@@ -196,22 +246,33 @@ def main():
                     "API Key",
                     value=serp_params.get("api_key"),
                     type="password",
+                    disabled=st.session_state.generating,
                 )
                 serp_location = st.text_input(
                     "Location",
                     value=serp_params.get("location"),
+                    disabled=st.session_state.generating,
                 )
                 serp_language = st.text_input(
-                    "Language", value=serp_params.get("language")
+                    "Language",
+                    value=serp_params.get("language"),
+                    disabled=st.session_state.generating,
                 )
                 serp_country = st.text_input(
-                    "Country", value=serp_params.get("country")
+                    "Country",
+                    value=serp_params.get("country"),
+                    disabled=st.session_state.generating,
                 )
                 serp_max_results = st.number_input(
-                    "Max Results", value=serp_params.get("max_results")
+                    "Max Results",
+                    value=serp_params.get("max_results"),
+                    disabled=st.session_state.generating,
                 )
 
-                if st.form_submit_button("Save SerpAPI Parameters"):
+                if st.form_submit_button(
+                    "Save SerpAPI Parameters",
+                    disabled=st.session_state.generating,
+                ):
                     serp_params = {
                         "api_key": serp_api_key,
                         "location": serp_location,
@@ -226,18 +287,6 @@ def main():
     # ---------------------------------------------------------------------------- #
     #                               Main content area                              #
     # ---------------------------------------------------------------------------- #
-    # Initialize session state for:
-    # - The generated text
-    # - Whether the article is being generated
-
-    if "generated_text" not in st.session_state:
-        st.session_state.generated_text = ""
-    if "generating" not in st.session_state:
-        st.session_state.generating = False
-    if "generation_complete" not in st.session_state:
-        st.session_state.generation_complete = False
-    if "generation_error" not in st.session_state:
-        st.session_state.generation_error = None
 
     async def generate_article_async():
         return ArticleGenerator().generate()

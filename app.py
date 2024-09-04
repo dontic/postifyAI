@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.config_loader import save_config, load_config, create_config
+from utils.config_loader import save_config, load_config
 from article_generator.article_generator import ArticleGenerator
 
 
@@ -17,10 +17,6 @@ def main():
 
     # Get or create the config
     param_config = load_config("param_config")
-    # Fallback if the config is empty
-    if not param_config:
-        create_config("param_config")
-        param_config = load_config("param_config")
 
     # Sidebar
     with st.sidebar:

@@ -73,15 +73,21 @@ class ArticleGenerator:
             summaries.append(summary)
 
         # Combine all the summaries into one summary
-        log.info(
-            f"Summarized {len(summaries)} contents, generating a combined summary..."
+        log.info(f"Summarized {len(summaries)} contents.")
+
+        log.info("Combining the content summaries...")
+        combined_content_summary, summary_error = summarizer.summarize_website(
+            "\n".join(summaries)
         )
-        combined_content_summary = summarizer.summarize_website("\n".join(summaries))
+
+        if summary_error:
+            log.error(f"Error creating the combined summary: {summary_error}")
+            return "", f"Error creating the combined summary:\n\n{summary_error}"
 
         log.info("Content Summarized.")
 
         # Populate the system prompt with the variables
-        log.info("Populating the system prompt...")
+        log.debug("Populating the system prompt...")
         formatted_system_prompt = self.system_prompt.format(
             language=self.language,
             expertise_field=self.expertise_field,
@@ -91,17 +97,23 @@ class ArticleGenerator:
             product_url=self.product_url,
             combined_content_summary=combined_content_summary,
         )
-
-        log.info("System Prompt populated.")
+        log.debug("System Prompt populated.")
 
         # Initialize the AI chat
         log.info("Initializing AI Chat...")
-        ai_chat = AI(formatted_system_prompt)
+        try:
+            ai_chat = AI(formatted_system_prompt)
+        except Exception as e:
+            log.error(f"Error initializing AI Chat: {e}")
+            return "", f"Error initializing AI Chat"
         log.info("AI Chat Initialized.")
 
         # Loop through the steps and generate the article
         full_article_list = []
-        for step in self.steps:
+        for index, step in enumerate(self.steps):
+            log.info(f"Processing step {index + 1} out of {len(self.steps)}")
+
+            # Format the prompt
             step_prompt = step["prompt"].format(
                 language=self.language,
                 expertise_field=self.expertise_field,
@@ -111,7 +123,13 @@ class ArticleGenerator:
                 product_url=self.product_url,
                 combined_content_summary=combined_content_summary,
             )
-            response = ai_chat.chat(step_prompt)
+            # Get the AI response
+            response, response_error = ai_chat.chat(step_prompt)
+
+            if response_error:
+                log.error(f"Error processing step {index + 1}: {response_error}")
+                return "", f"Error processing step {index + 1}:\n\n{response_error}"
+
             full_article_list.append(response)
 
         # Combine the article parts into a single article

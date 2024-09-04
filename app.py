@@ -288,6 +288,8 @@ def main():
     #                               Main content area                              #
     # ---------------------------------------------------------------------------- #
 
+    # Article generation coroutine
+    # This is needed to be fed into the asyncio.run() function
     async def generate_article_async():
         return ArticleGenerator().generate()
 
@@ -297,6 +299,7 @@ def main():
             st.session_state.generation_complete = False
             st.rerun()
 
+    # If the generation process is in progress
     if st.session_state.generating and not st.session_state.generation_complete:
         with st.spinner("Generating article... This might take a couple of minutes."):
             st.session_state.generated_text, st.session_state.generation_error = (
@@ -306,42 +309,36 @@ def main():
             st.session_state.generation_complete = True
             st.rerun()
 
-    if not st.session_state.generation_complete:
+    # If the generation process is not in progress and there wasn't a previous generation
+    # Display the GENERATE button only
+    elif not st.session_state.generating and not st.session_state.generation_complete:
         if st.button(
             "GENERATE" if not st.session_state.generation_complete else "REGENERATE",
             key="generate_button",
-            disabled=st.session_state.generating,
             use_container_width=True,
             type="primary",
         ):
-            st.session_state.generation_complete = False  # Reset
             start_generation()
+
+    # If the generation process is not in progress and there was a previous generation
     else:
 
-        # Display generation status
-        if st.session_state.generation_complete:
-            if st.session_state.generation_error:
-                st.error(
-                    f"""
-Error generating article!
-
-{st.session_state.generation_error}
-"""
-                )
-            else:
-                st.success("Article generated successfully!")
+        if st.session_state.generation_error:
+            st.error(
+                f"Error generating article!\n\n{st.session_state.generation_error}"
+            )
+        else:
+            st.success("Article generated successfully!")
 
         # Buttons for actions
-        col1, col2, col3 = st.columns(3)
+        col1, buff, col3 = st.columns(3)
 
         with col1:
             if st.button(
                 "REGENERATE",
                 key="regenerate_button",
-                disabled=st.session_state.generating,
                 type="primary",
             ):
-                st.session_state.generation_complete = False  # Reset
                 start_generation()
 
         with col3:
@@ -349,8 +346,6 @@ Error generating article!
                 "Download Markdown",
                 st.session_state.generated_text,
                 file_name="generated_article.md",
-                disabled=st.session_state.generating
-                or not st.session_state.generated_text,
             ):
                 st.write("Article downloaded!")
 

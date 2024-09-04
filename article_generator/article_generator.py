@@ -3,11 +3,14 @@
 from article_generator.ai_chat import AI
 from utils.config_loader import load_config
 from article_generator import serp_api, content_fetcher, summarizer
+from logging_setup import setup_logger
+
+log = setup_logger(__name__)
 
 
 class ArticleGenerator:
     def __init__(self):
-        print("Initializing Article Generator...")
+        log.info("Initializing Article Generator...")
 
         # Load article_params from the param_config.json file
         self.article_params = load_config("param_config")["article_params"]
@@ -36,31 +39,55 @@ class ArticleGenerator:
             for step in self.ai_prompts["steps"]
         ]
 
-        print("Article Generator Initialized.")
+        log.info("Article Generator Initialized.")
 
-    def generate(self):
-        print("Generating Article...")
+    def generate(self) -> tuple[str, str | None]:
+        log.info("Generating the article...")
 
         # Get the top urls from the search engine
-        print(f"Getting top URLs for keyphrase: {self.keyphrase}")
-        urls = serp_api.get_google_search_top_urls(self.keyphrase)
-        print(f"Top URLs: {urls}")
+        log.info(f"Getting top URLs for keyphrase: {self.keyphrase}")
+        urls, serpapi_error = serp_api.get_google_search_top_urls(self.keyphrase)
+
+        if serpapi_error:
+            log.error(f"Error getting SERP URLs: {serpapi_error}")
+            return "", f"Error getting SERP URLs:\n\n{serpapi_error}"
 
         # Get the content from the top urls
-        print("Fetching content from the top URLs...")
-        contents = content_fetcher.fetch_all_contents(urls)
-        print(f"Fetched {len(contents)} contents")
+        log.info("Fetching content from the top URLs...")
+        contents, content_fetching_error = content_fetcher.fetch_all_contents(urls)
+        if content_fetching_error:
+            log.error(f"Error fetching content: {content_fetching_error}")
+            return "", f"Error fetching content:\n\n{content_fetching_error}"
+
+        log.info(f"Fetched {len(contents)} contents")
 
         # Summarize each content
-        print("Summarizing the content...")
-        summaries = [summarizer.summarize_website(content) for content in contents]
+        log.info("Summarizing the content...")
+        summaries = []
+
+        for content in contents:
+            summary, summary_error = summarizer.summarize_website(content)
+            if summary_error:
+                log.error(f"Error summarizing content: {summary_error}")
+                return "", f"Error summarizing content:\n\n{summary_error}"
+            summaries.append(summary)
 
         # Combine all the summaries into one summary
-        combined_content_summary = summarizer.summarize_website("\n".join(summaries))
-        print(f"Combined Content Summary: {combined_content_summary}")
+        log.info(f"Summarized {len(summaries)} contents.")
+
+        log.info("Combining the content summaries...")
+        combined_content_summary, summary_error = summarizer.summarize_website(
+            "\n".join(summaries)
+        )
+
+        if summary_error:
+            log.error(f"Error creating the combined summary: {summary_error}")
+            return "", f"Error creating the combined summary:\n\n{summary_error}"
+
+        log.info("Content Summarized.")
 
         # Populate the system prompt with the variables
-        print("Populating the system prompt...")
+        log.debug("Populating the system prompt...")
         formatted_system_prompt = self.system_prompt.format(
             language=self.language,
             expertise_field=self.expertise_field,
@@ -70,16 +97,23 @@ class ArticleGenerator:
             product_url=self.product_url,
             combined_content_summary=combined_content_summary,
         )
-        print(formatted_system_prompt)
+        log.debug("System Prompt populated.")
 
         # Initialize the AI chat
-        print("Initializing AI Chat...")
-        ai_chat = AI(formatted_system_prompt)
-        print("AI Chat Initialized.")
+        log.info("Initializing AI Chat...")
+        try:
+            ai_chat = AI(formatted_system_prompt)
+        except Exception as e:
+            log.error(f"Error initializing AI Chat: {e}")
+            return "", f"Error initializing AI Chat"
+        log.info("AI Chat Initialized.")
 
         # Loop through the steps and generate the article
         full_article_list = []
-        for step in self.steps:
+        for index, step in enumerate(self.steps):
+            log.info(f"Processing step {index + 1} out of {len(self.steps)}")
+
+            # Format the prompt
             step_prompt = step["prompt"].format(
                 language=self.language,
                 expertise_field=self.expertise_field,
@@ -89,12 +123,16 @@ class ArticleGenerator:
                 product_url=self.product_url,
                 combined_content_summary=combined_content_summary,
             )
-            print(step_prompt)
-            response = ai_chat.chat(step_prompt)
+            # Get the AI response
+            response, response_error = ai_chat.chat(step_prompt)
+
+            if response_error:
+                log.error(f"Error processing step {index + 1}: {response_error}")
+                return "", f"Error processing step {index + 1}:\n\n{response_error}"
+
             full_article_list.append(response)
-            print(response)
 
         # Combine the article parts into a single article
         full_article = "\n".join(full_article_list)
 
-        return full_article
+        return full_article, None

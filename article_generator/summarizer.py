@@ -1,4 +1,7 @@
 from .ai_chat import AI
+from logging_setup import setup_logger
+
+log = setup_logger(__name__)
 
 
 def summarize_website(text: str) -> str:
@@ -13,8 +16,19 @@ def summarize_website(text: str) -> str:
         str: The summarized text
     """
 
-    prompt = f"Create a knowledge base of the tools, templates and references, in 300 words or less for the following website content: {text[:3000]}"
-    ai_chat = AI("")
-    summary = ai_chat.chat(prompt)
+    log.info("Summarizing the website content...")
 
-    return summary
+    prompt = f"Create a knowledge base of the tools, templates and references, in 300 words or less for the following website content: {text[:3000]}"
+    try:
+        ai_chat = AI("")
+    except Exception as e:
+        log.error(f"Error initializing AI Chat: {e}")
+        return "", f"Error initializing AI Chat"
+
+    summary, summary_error = ai_chat.chat(prompt)
+
+    if summary_error:
+        log.error(f"Error summarizing website content: {summary_error}")
+        return "", f"Error summarizing website content:\n\n{summary_error}"
+
+    return summary, None

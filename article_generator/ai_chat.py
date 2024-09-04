@@ -12,10 +12,15 @@ from anthropic import (
     APIError as ClaudeAPIError,
 )
 from utils.config_loader import load_config
+from logging_setup import setup_logger
+
+log = setup_logger(__name__)
 
 
 class AI:
-    def __init__(self, system_prompt):
+    def __init__(self, system_prompt: str):
+
+        log.info("Initializing AI Chat...")
 
         # Load the param_config.json file
         self.ai_provider = load_config("param_config")["ai_provider"]
@@ -28,6 +33,8 @@ class AI:
             raise ValueError("Invalid AI provider")
 
     def openai_init(self, system_prompt: str):
+        log.info("Initializing OpenAI Chat...")
+
         config = load_config("param_config")["openai_params"]
         self.api_key = config["api_key"]
         self.max_tokens = config["max_tokens"]
@@ -41,7 +48,11 @@ class AI:
         ]
 
         # Setup the Open AI client
-        self.client = OpenAI(api_key=self.api_key)
+        try:
+            self.client = OpenAI(api_key=self.api_key)
+        except Exception as e:
+            log.error(f"Error initializing OpenAI client: {e}")
+            raise
 
     def openai_chat(
         self,
@@ -49,7 +60,20 @@ class AI:
         model: str = None,
         temperature: float = None,
         retry_delay: int = 5,
-    ) -> str:
+    ) -> tuple[str, str | None]:
+        """
+        Function to chat with OpenAI
+
+        Args:
+            message (str): The message to send to OpenAI
+            model (str): The model to use for the response
+            temperature (float): The temperature for the response
+            retry_delay (int): The delay between retries
+
+        Returns:
+            response (str): The response from OpenAI
+            error (str | None): The error message if any
+        """
         # Append the message to the messages list
         self.conversation.append({"role": "user", "content": message})
 
@@ -63,6 +87,7 @@ class AI:
 
             # Get the response from OpenAI
             try:
+                log.info("Sending message to OpenAI...")
                 response = self.client.chat.completions.create(
                     messages=self.conversation,
                     max_tokens=self.max_tokens,
@@ -71,13 +96,16 @@ class AI:
                     response_format={"type": "text"},
                 )
                 attempt_success = True
+                log.info("Got response from OpenAI")
 
             except OpenAIRateLimitError as e:
                 # Handle rate limit error with exponential backoff
 
                 if attempt == self.max_retries:
-                    return "Max retries reached for rate limit."
+                    log.error("Max retries reached for rate limit.")
+                    return "", "Max retries reached for rate limit."
 
+                log.warn("Rate limit error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -85,8 +113,10 @@ class AI:
                 # Handle API connection error
 
                 if attempt == self.max_retries:
-                    return "Max retries reached for connection errors."
+                    log.error("Max retries reached for connection errors.")
+                    return "", "Max retries reached for connection errors."
 
+                log.warn("API connection error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -94,14 +124,24 @@ class AI:
                 # Handle general API errors
 
                 if attempt == self.max_retries:
-                    return "Max retries reached for API error."
+                    log.error("Max retries reached for API errors.")
+                    return (
+                        "",
+                        "Max retries reached for API errors. Please check that your OpenAI API key is correct.",
+                    )
 
+                log.warn("API error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
             except Exception as e:
                 # Catch-all for any other exceptions
-                raise
+                log.error(f"Error sending message to OpenAI: {e}")
+
+                return (
+                    "",
+                    "An unexpected error occurred while getting the response from OpenAI.",
+                )
 
         # Get the content of the response
         content = response.choices[0].message.content
@@ -109,7 +149,7 @@ class AI:
         # Append the response to the messages list
         self.conversation.append({"role": "assistant", "content": content})
 
-        return content
+        return content, None
 
     def claude_init(self, system_prompt):
         config = load_config("param_config")["claude_params"]
@@ -123,7 +163,11 @@ class AI:
         self.system = system_prompt
 
         # Setup the Claude client
-        self.client = Anthropic(api_key=self.api_key)
+        try:
+            self.client = Anthropic(api_key=self.api_key)
+        except Exception as e:
+            log.error(f"Error initializing Claude client: {e}")
+            raise
 
     def claude_chat(
         self,
@@ -131,7 +175,23 @@ class AI:
         model: str = None,
         temperature: float = None,
         retry_delay: int = 5,
-    ) -> str:
+    ) -> tuple[str, str | None]:
+        """
+        Function to chat with Claude
+
+        Args:
+            message (str): The message to send to Claude
+            model (str): The model to use for the response
+            temperature (float): The temperature for the response
+            retry_delay (int): The delay between retries
+
+        Returns:
+            response (str): The response from Claude
+            error (str | None): The error message if any
+        """
+
+        log.info("Sending message to Claude...")
+
         # Append the message to the messages list
         self.conversation.append({"role": "user", "content": message})
 
@@ -158,8 +218,10 @@ class AI:
                 # Handle rate limit error with exponential backoff
 
                 if attempt == self.max_retries:
-                    return "Max retries reached for rate limit."
+                    log.error("Max retries reached for rate limit.")
+                    return "", "Max retries reached for rate limit."
 
+                log.warn("Rate limit error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -167,8 +229,10 @@ class AI:
                 # Handle API connection error
 
                 if attempt == self.max_retries:
-                    return "Max retries reached for connection errors."
+                    log.error("Max retries reached for connection errors.")
+                    return "", "Max retries reached for connection errors."
 
+                log.warn("API connection error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -176,14 +240,24 @@ class AI:
                 # Handle general API errors
 
                 if attempt == self.max_retries:
-                    return "Max retries reached for API error."
+                    log.error("Max retries reached for API errors.")
+                    return (
+                        "",
+                        "Max retries reached for API errors. Please check that your Claude API key is correct.",
+                    )
 
+                log.warn("API error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
             except Exception as e:
                 # Catch-all for any other exceptions
-                raise
+
+                log.error(f"Error sending message to Claude: {e}")
+                return (
+                    "",
+                    "An unexpected error occurred while getting the response from Claude.",
+                )
 
         # Get the content of the response
         content = response.content[0].text
@@ -191,7 +265,7 @@ class AI:
         # Append the response to the messages list
         self.conversation.append({"role": "assistant", "content": content})
 
-        return content
+        return content, None
 
     def chat(
         self,
@@ -199,14 +273,44 @@ class AI:
         model: str = None,
         temperature: float = None,
         retry_delay: int = 5,
-    ) -> str:
+    ) -> tuple[str, str | None]:
+        """
+        Function to chat with the AI provider
+
+        Args:
+            message (str): The message to send to the AI provider
+            model (str): The model to use for the response
+            temperature (float): The temperature for the response
+            retry_delay (int): The delay between retries
+
+        Returns:
+            response (str): The response from the AI provider
+            error (str | None): The error message if any
+        """
+
+        log.info("Sending AI message...")
+
         if self.ai_provider == "openai":
-            response = self.openai_chat(
-                message, model=model, temperature=temperature, retry_delay=retry_delay
+            response, error = self.openai_chat(
+                message,
+                model=model,
+                temperature=temperature,
+                retry_delay=retry_delay,
             )
-            return response
+
+            if error:
+                log.error(f"Error sending message to OpenAI: {error}")
+                return "", f"Error sending message to OpenAI:\n\n{error}"
+
+            return response, None
+
         elif self.ai_provider == "claude":
-            response = self.claude_chat(
+            response, error = self.claude_chat(
                 message, model=model, temperature=temperature, retry_delay=retry_delay
             )
-            return response
+
+            if error:
+                log.error(f"Error sending message to Claude: {error}")
+                return "", f"Error sending message to Claude:\n\n{error}"
+
+            return response, None

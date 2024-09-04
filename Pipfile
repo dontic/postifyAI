@@ -11,6 +11,7 @@ openai = "*"
 anthropic = "*"
 ipykernel = "*"
 streamlit = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

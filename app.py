@@ -1,3 +1,4 @@
+import asyncio
 import streamlit as st
 from utils.config_loader import save_config, load_config
 from article_generator.article_generator import ArticleGenerator
@@ -225,25 +226,89 @@ def main():
     # ---------------------------------------------------------------------------- #
     #                               Main content area                              #
     # ---------------------------------------------------------------------------- #
-    st.title("Generated Article")
+    # Initialize session state for:
+    # - The generated text
+    # - Whether the article is being generated
 
-    # Initialize session state for the generated text
     if "generated_text" not in st.session_state:
         st.session_state.generated_text = ""
+    if "generating" not in st.session_state:
+        st.session_state.generating = False
+    if "generation_complete" not in st.session_state:
+        st.session_state.generation_complete = False
+    if "generation_error" not in st.session_state:
+        st.session_state.generation_error = None
 
-    # Generate button
-    if st.button("GENERATE", key="generate_button"):
-        # Here you would call your article generation function
-        # For now, we'll just update the output text area with a placeholder
-        st.session_state.generated_text = ArticleGenerator().generate()
+    async def generate_article_async():
+        return ArticleGenerator().generate()
 
-    # Text area for output
-    st.text_area(
-        "Your generated article will appear here...",
-        value=st.session_state.generated_text,
-        height=400,
-        key="output_area",
-    )
+    def start_generation():
+        if not st.session_state.generating:
+            st.session_state.generating = True
+            st.session_state.generation_complete = False
+            st.rerun()
+
+    if st.session_state.generating and not st.session_state.generation_complete:
+        with st.spinner("Generating article... This might take a couple of minutes."):
+            st.session_state.generated_text, st.session_state.generation_error = (
+                asyncio.run(generate_article_async())
+            )
+            st.session_state.generating = False
+            st.session_state.generation_complete = True
+            st.rerun()
+
+    if not st.session_state.generation_complete:
+        if st.button(
+            "GENERATE" if not st.session_state.generation_complete else "REGENERATE",
+            key="generate_button",
+            disabled=st.session_state.generating,
+            use_container_width=True,
+            type="primary",
+        ):
+            st.session_state.generation_complete = False  # Reset
+            start_generation()
+    else:
+
+        # Display generation status
+        if st.session_state.generation_complete:
+            if st.session_state.generation_error:
+                st.error(
+                    f"""
+Error generating article!
+
+{st.session_state.generation_error}
+"""
+                )
+            else:
+                st.success("Article generated successfully!")
+
+        # Buttons for actions
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            if st.button(
+                "REGENERATE",
+                key="regenerate_button",
+                disabled=st.session_state.generating,
+                type="primary",
+            ):
+                st.session_state.generation_complete = False  # Reset
+                start_generation()
+
+        with col3:
+            if st.download_button(
+                "Download Markdown",
+                st.session_state.generated_text,
+                file_name="generated_article.md",
+                disabled=st.session_state.generating
+                or not st.session_state.generated_text,
+            ):
+                st.write("Article downloaded!")
+
+        # Display generated text
+        st.markdown(
+            st.session_state.generated_text or "Your article will appear here..."
+        )
 
 
 if __name__ == "__main__":

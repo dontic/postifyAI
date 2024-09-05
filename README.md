@@ -12,37 +12,57 @@
 ## Get started
 ### Self Hosted
 
-> You will need to get API keys for:
-> - OpenAI or Claude
-> - SerpAPI
+You need to have API access to:
+- OpenAI or Claude
+- SerpAPI
 
 You can then deploy the tool locally with docker:
   
-  ```bash
-  docker run -p 8501:8501 dontic/postifyai:1.0.0
-  ```
-
-### Cloud Hosted
-
-If you don't want to go through the hassle of setting up the tool, you can use a personalised cloud hosted version just for you:
-
-```
-yourname.postify.dev
+```bash
+docker run -p 8501:8501 dontic/postifyai:latest
 ```
 
-You can request access to the cloud hosted version by sending an email to [hey@postifyai.com](mailto:hey@postifyai.com)
+The tool will be available at `http://localhost:8501`
+
+---
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap');
+    
+    .postifyai-heading {
+        font-size: 2rem;
+        color: #333;
+        font-family: Arial, sans-serif;
+        margin: 0;
+    }
+    
+    .gradient-text {
+        font-family: 'Exo 2', sans-serif;
+        background: linear-gradient(45deg, #007bff, #ff69b4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        display: inline-block;
+        font-weight: 700;
+    }
+</style>
+
+<h3 class="postifyai-heading">postifyAI <span class="gradient-text">Cloud</span></h3>
+
+<br>
+
+Have a ready-to-use version of postifyAI:
+
+- Just sign up and start generating articles
+- Hosted in the cloud
+- No API keys required
+- Personalized domain: `yourname.postifyai.com`
 
 
+> ℹ️ Send an email to [hey@postifyai.com](mailto:hey@postifyai.com) to request early access.
 
-#### Plan Details
 
-postifyAI cloud works on credits. One credit allows you to create a full blog post in less than 3 minutes.
-
-Discounts are applied for bulk purchases.
-
-|  | 1 credit | 10 credits | 50 credits | 200 credits |
-|---------|----------|------------|------------|-------------|
-| **Price** | $4 | <s>$40</s> $36 | <s>$200</s> $160 | <s>$800</s> $480 |
+__1 credit = 1 article in less than 3 minutes__
 
 
 

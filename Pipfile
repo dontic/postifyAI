@@ -12,6 +12,7 @@ anthropic = "*"
 ipykernel = "*"
 streamlit = "*"
 python-dotenv = "*"
+stqdm = "*"
 
 [dev-packages]
 

@@ -1,4 +1,4 @@
-# ![postifyAI](demo/assets/logo.svg "Cover")
+<img src="demo/assets/logo.svg" height="50">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Latest version](https://img.shields.io/github/v/release/dontic/postifyai
@@ -25,7 +25,7 @@ docker run -p 8501:8501 dontic/postifyai:latest
 The tool will be available at `http://localhost:8501`
 
 ---
-### ![postifyAI cloud](demo/assets/logo-cloud.svg "Cover")
+<img src="demo/assets/logo-cloud.svg" height="50">
 
 Have a ready-to-use version of postifyAI:
 

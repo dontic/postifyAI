@@ -54,6 +54,19 @@ def main():
         """
         return ai_provider_list.index(ai_provider)
 
+    def get_article_type_index(article_type: str, article_types: list[str]) -> int:
+        """
+        Get the index of the article type in the list
+
+        Args:
+            article_type (str): The article type to get the index of
+            article_types (list[str]): The list of article types
+
+        Returns:
+            int: The index of the article type in the list
+        """
+        return article_types.index(article_type)
+
     # --------------------------------- Callbacks -------------------------------- #
     def save_article_params():
         params["article_params"] = {
@@ -136,7 +149,11 @@ def main():
                 article_types,
                 format_func=lambda x: prompts.get(x).get("name"),
                 key="article_type",
-                index=0,
+                index=(
+                    get_article_type_index(
+                        article_params.get("article_type"), article_types
+                    )
+                ),
                 disabled=st.session_state.generating,
             )
             st.text_input(

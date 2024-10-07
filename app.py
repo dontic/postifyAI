@@ -89,6 +89,18 @@ def main():
         config_manager.save_params(params)
         st.success("Claude AI parameters saved!")
 
+    def save_serp_params():
+        serp_params = {
+            "api_key": st.session_state.serp_api_key,
+            "location": st.session_state.serp_location,
+            "language": st.session_state.serp_language,
+            "country": st.session_state.serp_country,
+            "max_results": st.session_state.serp_max_results,
+        }
+        params["serp_params"] = serp_params
+        config_manager.save_params(params)
+        st.success("SerpAPI parameters saved!")
+
     # --------------------------------- Layout ---------------------------------- #
 
     # Sidebar
@@ -295,47 +307,41 @@ def main():
             serp_params = params.get("serp_params")
 
             with st.form("serp_params_form"):
-                serp_api_key = st.text_input(
+                st.text_input(
                     "API Key",
                     value=serp_params.get("api_key"),
+                    key="serp_api_key",
                     type="password",
                     disabled=st.session_state.generating,
                 )
-                serp_location = st.text_input(
+                st.text_input(
                     "Location",
+                    key="serp_location",
                     value=serp_params.get("location"),
                     disabled=st.session_state.generating,
                 )
-                serp_language = st.text_input(
+                st.text_input(
                     "Language",
+                    key="serp_language",
                     value=serp_params.get("language"),
                     disabled=st.session_state.generating,
                 )
-                serp_country = st.text_input(
+                st.text_input(
                     "Country",
+                    key="serp_country",
                     value=serp_params.get("country"),
                     disabled=st.session_state.generating,
                 )
-                serp_max_results = st.number_input(
+                st.number_input(
                     "Max Results",
+                    key="serp_max_results",
                     value=serp_params.get("max_results"),
                     disabled=st.session_state.generating,
                 )
-
-                if st.form_submit_button(
+                st.form_submit_button(
                     "Save SerpAPI Parameters",
                     disabled=st.session_state.generating,
-                ):
-                    serp_params = {
-                        "api_key": serp_api_key,
-                        "location": serp_location,
-                        "language": serp_language,
-                        "country": serp_country,
-                        "max_results": serp_max_results,
-                    }
-                    params["serp_params"] = serp_params
-                    config_manager.save_params(params)
-                    st.success("SerpAPI parameters saved!")
+                )
 
     # ---------------------------------------------------------------------------- #
     #                               Main content area                              #

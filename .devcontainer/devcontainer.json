@@ -1,9 +1,13 @@
 // devcontainer.json
 {
     "name": "Python Devcontainer", // Name of the development container
-    "shutdownAction": "stopCompose", // Container behavior on VSCode close: none, stopContainer (default for image or Dockerfile), and stopCompose (default for Docker Compose)
-    "dockerComposeFile": "docker-compose.yml",
-    "service": "python",
+    "shutdownAction": "stopContainer", // Container behavior on VSCode close: none, stopContainer (default for image or Dockerfile), and stopCompose (default for Docker Compose)
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    // "dockerComposeFile": "docker-compose.yml",
+    // "service": "python",
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
     // Extensions and settings
     "customizations": {

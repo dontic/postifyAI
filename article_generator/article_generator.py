@@ -1,7 +1,7 @@
 # article_generator.py
 
 from article_generator.ai_chat import AI
-from utils.config_loader import load_config
+from utils.json_loader import load_config
 from article_generator import serp_api, content_fetcher, summarizer
 from logging_setup import setup_logger
 import streamlit as st

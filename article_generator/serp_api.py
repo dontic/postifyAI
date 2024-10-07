@@ -1,6 +1,6 @@
 import serpapi
 from serpapi import SerpApiError, HTTPConnectionError
-from utils.config_loader import load_config
+from utils.json_loader import load_config
 from logging_setup import setup_logger
 
 log = setup_logger(__name__)

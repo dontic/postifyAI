@@ -1,5 +1,5 @@
-# config_loader.py
-# This module contains functions to save and load configurations stored in json files.
+# json_loader.py
+# This module contains functions to save and load json files.
 
 import json
 from pathlib import Path

@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.config_loader import save_config, load_config
+from utils.json_loader import save_config, load_config
 from article_generator.article_generator import ArticleGenerator
 
 from time import sleep

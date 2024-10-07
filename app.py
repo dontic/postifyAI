@@ -2,9 +2,6 @@ import streamlit as st
 from article_generator.article_generator import ArticleGenerator
 from utils.config_manager import ConfigManager
 
-from time import sleep
-from stqdm import stqdm
-
 
 # Main app
 def main():

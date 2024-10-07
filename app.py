@@ -145,7 +145,7 @@ def main():
             # Load article types
             article_types = list(prompts.keys())
             st.selectbox(
-                "Type of article (More options coming soon)",
+                "Type of article",
                 article_types,
                 format_func=lambda x: prompts.get(x).get("name"),
                 key="article_type",

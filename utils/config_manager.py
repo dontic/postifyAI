@@ -58,7 +58,7 @@ class ConfigManager:
         with open(self.params_path, "w") as f:
             json.dump(params, f, indent=4, sort_keys=True)
 
-    def load_prompts() -> dict:
+    def load_prompts(self) -> dict:
         """
         Load the prompt config file
 

@@ -60,3 +60,37 @@ def get_google_search_top_urls(query: str) -> tuple[list[str], str | None]:
     log.info(f"Returning top {len(urls)} URLs")
 
     return urls, None
+
+
+def get_youtube_search_top_urls(query: str) -> tuple[list[str], str | None]:
+    # Initialize the error
+    error = None
+
+    # Initialize the serpapi client
+    serpapi_client = serpapi.Client(api_key=serp_config["api_key"])
+
+    # Try to get the search results
+    try:
+        log.info(f"Getting youtube search results for query: {query}")
+
+        search_results = serpapi_client.search(
+            q=query,
+            engine="youtube",
+            gl=serp_config["country"],
+        )
+    except HTTPConnectionError as e:
+        log.error(f"Could not connect to the SerpApi server: {e}")
+
+        error = "Could not connect to the SerpApi server at this time"
+
+        return [], error
+    except SerpApiError as e:
+        log.error(f"Client error: {e}")
+
+        error = "Client error, check that your Serp API key is correct"
+
+        return [], error
+    except Exception as e:
+        log.error(f"An unexpected error ocurred: {e}")
+
+        error = "An unexpected error ocurred."

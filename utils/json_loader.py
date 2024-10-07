@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Function to save json files
-def save_config(filepath, data):
+def save_json(filepath, data):
     """
     Save a json file with the given data
 

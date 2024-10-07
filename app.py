@@ -77,6 +77,18 @@ def main():
         config_manager.save_params(params)
         st.success("OpenAI parameters saved!")
 
+    def save_claude_params():
+        claude_params = {
+            "api_key": st.session_state.claude_api_key,
+            "max_tokens": st.session_state.claude_max_tokens,
+            "temperature": st.session_state.claude_temperature,
+            "max_retries": st.session_state.claude_max_retries,
+            "default_model": st.session_state.claude_default_model,
+        }
+        params["claude_params"] = claude_params
+        config_manager.save_params(params)
+        st.success("Claude AI parameters saved!")
+
     # --------------------------------- Layout ---------------------------------- #
 
     # Sidebar
@@ -230,12 +242,14 @@ def main():
                 with st.form("claude_params_form"):
                     claude_api_key = st.text_input(
                         "API Key",
+                        key="claude_api_key",
                         value=claude_params.get("api_key"),
                         type="password",
                         disabled=st.session_state.generating,
                     )
                     claude_max_tokens = st.number_input(
                         "Max Tokens",
+                        key="claude_max_tokens",
                         value=claude_params.get("max_tokens"),
                         disabled=st.session_state.generating,
                     )
@@ -244,33 +258,27 @@ def main():
                         0.0,
                         1.0,
                         claude_params.get("temperature"),
+                        key="claude_temperature",
                         disabled=st.session_state.generating,
                     )
                     claude_max_retries = st.number_input(
                         "Max Retries",
+                        key="claude_max_retries",
                         value=claude_params.get("max_retries"),
                         disabled=st.session_state.generating,
                     )
                     claude_default_model = st.text_input(
                         "Default Model",
+                        key="claude_default_model",
                         value=claude_params.get("default_model"),
                         disabled=st.session_state.generating,
                     )
 
-                    if st.form_submit_button(
+                    st.form_submit_button(
                         "Save Claude AI Parameters",
                         disabled=st.session_state.generating,
-                    ):
-                        claude_params = {
-                            "api_key": claude_api_key,
-                            "max_tokens": claude_max_tokens,
-                            "temperature": claude_temperature,
-                            "max_retries": claude_max_retries,
-                            "default_model": claude_default_model,
-                        }
-                        params["claude_params"] = claude_params
-                        config_manager.save_params(params)
-                        st.success("Claude AI parameters saved!")
+                        on_click=save_claude_params,
+                    )
 
         else:
             st.error("Please select a valid AI provider")

@@ -109,7 +109,7 @@ class AI:
                     log.error("Max retries reached for rate limit.")
                     return "", "Max retries reached for rate limit."
 
-                log.warn("Rate limit error. Retrying...")
+                log.warning("Rate limit error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -120,7 +120,7 @@ class AI:
                     log.error("Max retries reached for connection errors.")
                     return "", "Max retries reached for connection errors."
 
-                log.warn("API connection error. Retrying...")
+                log.warning("API connection error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -134,7 +134,7 @@ class AI:
                         "Max retries reached for API errors. Please check that your OpenAI API key is correct.",
                     )
 
-                log.warn("API error. Retrying...")
+                log.warning("API error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -225,7 +225,7 @@ class AI:
                     log.error("Max retries reached for rate limit.")
                     return "", "Max retries reached for rate limit."
 
-                log.warn("Rate limit error. Retrying...")
+                log.warning("Rate limit error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -236,7 +236,7 @@ class AI:
                     log.error("Max retries reached for connection errors.")
                     return "", "Max retries reached for connection errors."
 
-                log.warn("API connection error. Retrying...")
+                log.warning("API connection error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -250,7 +250,7 @@ class AI:
                         "Max retries reached for API errors. Please check that your Claude API key is correct.",
                     )
 
-                log.warn("API error. Retrying...")
+                log.warning("API error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 

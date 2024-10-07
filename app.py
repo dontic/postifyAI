@@ -21,6 +21,9 @@ def main():
         layout="wide",
     )
 
+    # Load the prompts
+    prompts = config_manager.load_prompts()
+
     # -------------------- Initialize session state variables -------------------- #
     if "show_openai_params" not in st.session_state:
         st.session_state.show_openai_params = False
@@ -126,9 +129,12 @@ def main():
                 value=article_params.get("language"),
                 disabled=st.session_state.generating,
             )
+            # Load article types
+            article_types = list(prompts.keys())
             st.selectbox(
                 "Type of article (More options coming soon)",
-                ["guide"],
+                article_types,
+                format_func=lambda x: prompts.get(x).get("name"),
                 key="article_type",
                 index=0,
                 disabled=st.session_state.generating,

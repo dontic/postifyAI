@@ -4,7 +4,6 @@
 # Imports
 import json
 from pathlib import Path
-import shutil
 
 # Define base directory
 BASE_DIR = Path(__file__).resolve().parent.parent

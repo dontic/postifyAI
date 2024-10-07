@@ -4,9 +4,9 @@
         "article_type": "guide",
         "expertise_field": "SEO & Marketing",
         "keyphrase": "How to write SEO articles for my landing page",
-        "product_name": "ContentCraftAI",
+        "product_name": "postifyAI",
         "product_description": "A powerful AI tool to generate SEO optimized articles for your website",
-        "product_url": "https://github.com/dontic/ai-seo-blog"
+        "product_url": "https://postifyai.com"
     },
     "ai_provider": "openai",
     "openai_params": {

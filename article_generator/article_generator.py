@@ -1,7 +1,7 @@
 # article_generator.py
 
 from article_generator.ai_chat import AI
-from utils.config_loader import load_config
+from utils.config_manager import ConfigManager
 from article_generator import serp_api, content_fetcher, summarizer
 from logging_setup import setup_logger
 import streamlit as st
@@ -13,8 +13,11 @@ class ArticleGenerator:
     def __init__(self):
         log.info("Initializing Article Generator...")
 
+        # Initialize the config manager
+        self.config_manager = ConfigManager()
+
         # Load article_params from the param_config.json file
-        self.article_params = load_config("param_config")["article_params"]
+        self.article_params = self.config_manager.load_params()["article_params"]
         self.language = self.article_params["language"]
         self.article_type = self.article_params["article_type"]
         self.expertise_field = self.article_params["expertise_field"]
@@ -24,7 +27,7 @@ class ArticleGenerator:
         self.product_url = self.article_params["product_url"]
 
         # Load the AI steps for the type of article
-        self.ai_prompts = load_config("prompt_config")
+        self.ai_prompts = self.config_manager.load_prompts()
 
         # Load the prompt config for the article type
         self.ai_prompts = self.ai_prompts[self.article_type]

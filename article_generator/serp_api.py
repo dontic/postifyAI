@@ -1,12 +1,15 @@
 import serpapi
 from serpapi import SerpApiError, HTTPConnectionError
-from utils.config_loader import load_config
+from utils.config_manager import ConfigManager
 from logging_setup import setup_logger
 
 log = setup_logger(__name__)
 
+# Initialize the config manager
+config_manager = ConfigManager()
+
 # Load the param_config.json file
-serp_config = load_config("param_config")["serp_params"]
+serp_config = config_manager.load_params()["serp_params"]
 
 
 def get_google_search_top_urls(query: str) -> tuple[list[str], str | None]:

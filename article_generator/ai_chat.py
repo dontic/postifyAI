@@ -11,7 +11,7 @@ from anthropic import (
     APIConnectionError as ClaudeAPIConnectionError,
     APIError as ClaudeAPIError,
 )
-from utils.config_loader import load_config
+from utils.config_manager import ConfigManager
 from logging_setup import setup_logger
 
 log = setup_logger(__name__)
@@ -22,8 +22,11 @@ class AI:
 
         log.info("Initializing AI Chat...")
 
+        # Initialize the config manager
+        self.config_manager = ConfigManager()
+
         # Load the param_config.json file
-        self.ai_provider = load_config("param_config")["ai_provider"]
+        self.ai_provider = self.config_manager.load_params()["ai_provider"]
 
         if self.ai_provider == "openai":
             self.openai_init(system_prompt)
@@ -35,7 +38,8 @@ class AI:
     def openai_init(self, system_prompt: str):
         log.info("Initializing OpenAI Chat...")
 
-        config = load_config("param_config")["openai_params"]
+        config = self.config_manager.load_params()["openai_params"]
+        config = config["openai_params"]
         self.api_key = config["api_key"]
         self.max_tokens = config["max_tokens"]
         self.temperature = config["temperature"]
@@ -152,7 +156,7 @@ class AI:
         return content, None
 
     def claude_init(self, system_prompt):
-        config = load_config("param_config")["claude_params"]
+        config = self.config_manager.load_params()["claude_params"]
         self.conversation = []
         self.api_key = config["api_key"]
         self.max_tokens = config["max_tokens"]

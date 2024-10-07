@@ -1,6 +1,6 @@
 import streamlit as st
-from utils.json_loader import save_config, load_config
 from article_generator.article_generator import ArticleGenerator
+from utils.config_manager import ConfigManager
 
 from time import sleep
 from stqdm import stqdm
@@ -8,6 +8,14 @@ from stqdm import stqdm
 
 # Main app
 def main():
+
+    # Initialize the config manager
+    config_manager = ConfigManager()
+
+    # Load the parameters from the config file
+    params = config_manager.load_params()
+
+    # Set the page config
     st.set_page_config(page_title="SEO Article Generator", layout="wide")
 
     # -------------------- Initialize session state variables -------------------- #
@@ -26,8 +34,41 @@ def main():
     if "generation_error" not in st.session_state:
         st.session_state.generation_error = None
 
-    # Get or create the param config when the app starts or re-runs
-    param_config = load_config("param_config")
+    # --------------------------------- Functions -------------------------------- #
+    def get_ai_provider_index(ai_provider: str, ai_provider_list: list[str]) -> int:
+        """
+        Get the index of the AI provider in the list
+
+        Args:
+            ai_provider (str): The AI provider to get the index of
+            ai_provider_list (list[str]): The list of AI providers
+
+        Returns:
+            int: The index of the AI provider in the list
+        """
+        return ai_provider_list.index(ai_provider)
+
+    # --------------------------------- Callbacks -------------------------------- #
+    def save_article_params():
+        params["article_params"] = {
+            "language": st.session_state.language,
+            "article_type": st.session_state.article_type,
+            "expertise_field": st.session_state.expertise_field,
+            "keyphrase": st.session_state.keyphrase,
+            "product_name": st.session_state.product_name,
+            "product_description": st.session_state.product_description,
+            "product_url": st.session_state.product_url,
+        }
+        config_manager.save_params(params)
+
+        st.toast("Article parameters saved!", icon="✅")
+
+    def save_ai_provider():
+        print(st.session_state.ai_provider)
+        params["ai_provider"] = st.session_state.ai_provider
+        config_manager.save_params(params)
+
+    # --------------------------------- Layout ---------------------------------- #
 
     # Sidebar
     with st.sidebar:
@@ -37,78 +78,76 @@ def main():
         # ---------------------------------------------------------------------------- #
         st.title("Article Parameters")
 
-        article_params = param_config.get("article_params")
+        article_params = params.get("article_params")
 
+        # Article parameters form
         with st.form("article_params_form"):
-
-            language = st.text_input(
+            st.text_input(
                 "Language",
+                key="language",
                 value=article_params.get("language"),
                 disabled=st.session_state.generating,
             )
-            article_type = st.selectbox(
+            st.selectbox(
                 "Type of article (More options coming soon)",
                 ["guide"],
+                key="article_type",
                 index=0,
                 disabled=st.session_state.generating,
             )
-            expertise_field = st.text_input(
+            st.text_input(
                 "Expertise field",
+                key="expertise_field",
                 value=article_params.get("expertise_field"),
                 disabled=st.session_state.generating,
             )
-            keyphrase = st.text_input(
+            st.text_input(
                 "Keyphrase",
+                key="keyphrase",
                 value=article_params.get("keyphrase"),
                 disabled=st.session_state.generating,
             )
-            product_name = st.text_input(
+            st.text_input(
                 "Product name",
+                key="product_name",
                 value=article_params.get("product_name"),
                 disabled=st.session_state.generating,
             )
-            product_description = st.text_area(
+            st.text_area(
                 "Product description",
+                key="product_description",
                 value=article_params.get("product_description"),
                 disabled=st.session_state.generating,
             )
-            product_url = st.text_input(
+            st.text_input(
                 "Product URL",
+                key="product_url",
                 value=article_params.get("product_url"),
                 disabled=st.session_state.generating,
             )
-
-            if st.form_submit_button(
+            st.form_submit_button(
                 "Save Article Parameters",
                 disabled=st.session_state.generating,
-            ):
-                article_params = {
-                    "language": language,
-                    "article_type": article_type,
-                    "expertise_field": expertise_field,
-                    "keyphrase": keyphrase,
-                    "product_name": product_name,
-                    "product_description": product_description,
-                    "product_url": product_url,
-                }
-                param_config["article_params"] = article_params
-                save_config("param_config", param_config)
-                st.success("Article parameters saved!")
+                on_click=save_article_params,
+            )
 
         # ---------------------------------------------------------------------------- #
         #                               System Parameters                              #
         # ---------------------------------------------------------------------------- #
         st.title("System Parameters")
 
-        # ----------------------------- AI Model Selector ---------------------------- #
-        ai_provider = st.selectbox(
+        # --------------------------- AI provider Selector --------------------------- #
+        ai_provider_list = ["openai", "claude"]
+        ai_provider = params.get("ai_provider")
+
+        st.selectbox(
             "Select AI Provider",
-            ["openai", "claude"],
-            index=(0 if param_config.get("ai_provider") == "openai" else 1),
+            ai_provider_list,
+            key="ai_provider",
+            index=(get_ai_provider_index(ai_provider, ai_provider_list)),
             disabled=st.session_state.generating,
+            on_change=save_ai_provider,
         )
-        param_config["ai_provider"] = ai_provider
-        save_config("param_config", param_config)
 
         # ----------------------------- OpenAI Parameters ---------------------------- #
         if ai_provider == "openai":
@@ -123,7 +162,7 @@ def main():
                 )
 
             if st.session_state.show_openai_params:
-                openai_params = param_config.get("openai_params")
+                openai_params = params.get("openai_params")
 
                 with st.form("openai_params_form"):
                     openai_api_key = st.text_input(
@@ -166,8 +205,8 @@ def main():
                             "max_retries": openai_max_retries,
                             "default_model": openai_default_model,
                         }
-                        param_config["openai_params"] = openai_params
-                        save_config("param_config", param_config)
+                        params["openai_params"] = openai_params
+                        config_manager.save_params(params)
                         st.success("OpenAI parameters saved!")
 
         # --------------------------- Claude AI Parameters --------------------------- #
@@ -182,7 +221,7 @@ def main():
                 )
 
             if st.session_state.show_claude_params:
-                claude_params = param_config.get("claude_params")
+                claude_params = params.get("claude_params")
 
                 with st.form("claude_params_form"):
                     claude_api_key = st.text_input(
@@ -225,8 +264,8 @@ def main():
                             "max_retries": claude_max_retries,
                             "default_model": claude_default_model,
                         }
-                        param_config["claude_params"] = claude_params
-                        save_config("param_config", param_config)
+                        params["claude_params"] = claude_params
+                        config_manager.save_params(params)
                         st.success("Claude AI parameters saved!")
 
         else:
@@ -241,7 +280,7 @@ def main():
             st.session_state.show_serp_params = not st.session_state.show_serp_params
 
         if st.session_state.show_serp_params:
-            serp_params = param_config.get("serp_params")
+            serp_params = params.get("serp_params")
 
             with st.form("serp_params_form"):
                 serp_api_key = st.text_input(
@@ -282,8 +321,8 @@ def main():
                         "country": serp_country,
                         "max_results": serp_max_results,
                     }
-                    param_config["serp_params"] = serp_params
-                    save_config("param_config", param_config)
+                    params["serp_params"] = serp_params
+                    config_manager.save_params(params)
                     st.success("SerpAPI parameters saved!")
 
     # ---------------------------------------------------------------------------- #

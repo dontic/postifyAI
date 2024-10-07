@@ -57,7 +57,6 @@ def main():
             "product_url": st.session_state.product_url,
         }
         config_manager.save_params(params)
-
         st.toast("Article parameters saved!", icon="✅")
 
     def save_ai_provider():
@@ -75,7 +74,7 @@ def main():
         }
         params["openai_params"] = openai_params
         config_manager.save_params(params)
-        st.success("OpenAI parameters saved!")
+        st.toast("OpenAI parameters saved!", icon="✅")
 
     def save_claude_params():
         claude_params = {
@@ -87,7 +86,7 @@ def main():
         }
         params["claude_params"] = claude_params
         config_manager.save_params(params)
-        st.success("Claude AI parameters saved!")
+        st.toast("Claude AI parameters saved!", icon="✅")
 
     def save_serp_params():
         serp_params = {
@@ -99,7 +98,7 @@ def main():
         }
         params["serp_params"] = serp_params
         config_manager.save_params(params)
-        st.success("SerpAPI parameters saved!")
+        st.toast("SerpAPI parameters saved!", icon="✅")
 
     # --------------------------------- Layout ---------------------------------- #
 
@@ -341,6 +340,7 @@ def main():
                 st.form_submit_button(
                     "Save SerpAPI Parameters",
                     disabled=st.session_state.generating,
+                    on_click=save_serp_params,
                 )
 
     # ---------------------------------------------------------------------------- #

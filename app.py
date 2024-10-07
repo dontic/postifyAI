@@ -1,4 +1,5 @@
 import streamlit as st
+from PIL import Image
 from article_generator.article_generator import ArticleGenerator
 from utils.config_manager import ConfigManager
 
@@ -13,7 +14,12 @@ def main():
     params = config_manager.load_params()
 
     # Set the page config
-    st.set_page_config(page_title="SEO Article Generator", layout="wide")
+    favicon = Image.open("assets/favicon.ico")
+    st.set_page_config(
+        page_title="postifyAI",
+        page_icon=favicon,
+        layout="wide",
+    )
 
     # -------------------- Initialize session state variables -------------------- #
     if "show_openai_params" not in st.session_state:

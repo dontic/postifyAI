@@ -65,6 +65,18 @@ def main():
         params["ai_provider"] = st.session_state.ai_provider
         config_manager.save_params(params)
 
+    def save_openai_params():
+        openai_params = {
+            "api_key": st.session_state.openai_api_key,
+            "max_tokens": st.session_state.openai_max_tokens,
+            "temperature": st.session_state.openai_temperature,
+            "max_retries": st.session_state.openai_max_retries,
+            "default_model": st.session_state.openai_default_model,
+        }
+        params["openai_params"] = openai_params
+        config_manager.save_params(params)
+        st.success("OpenAI parameters saved!")
+
     # --------------------------------- Layout ---------------------------------- #
 
     # Sidebar
@@ -162,49 +174,44 @@ def main():
                 openai_params = params.get("openai_params")
 
                 with st.form("openai_params_form"):
-                    openai_api_key = st.text_input(
+                    st.text_input(
                         "API Key",
+                        key="openai_api_key",
                         value=openai_params.get("api_key"),
                         type="password",
                         disabled=st.session_state.generating,
                     )
-                    openai_max_tokens = st.number_input(
+                    st.number_input(
                         "Max Tokens",
+                        key="openai_max_tokens",
                         value=openai_params.get("max_tokens"),
                         disabled=st.session_state.generating,
                     )
-                    openai_temperature = st.slider(
+                    st.slider(
                         "Temperature",
                         0.0,
                         1.0,
                         openai_params.get("temperature"),
+                        key="openai_temperature",
                         disabled=st.session_state.generating,
                     )
-                    openai_max_retries = st.number_input(
+                    st.number_input(
                         "Max Retries",
+                        key="openai_max_retries",
                         value=openai_params.get("max_retries"),
                         disabled=st.session_state.generating,
                     )
-                    openai_default_model = st.text_input(
+                    st.text_input(
                         "Default Model",
+                        key="openai_default_model",
                         value=openai_params.get("default_model"),
                         disabled=st.session_state.generating,
                     )
-
-                    if st.form_submit_button(
+                    st.form_submit_button(
                         "Save OpenAI Parameters",
                         disabled=st.session_state.generating,
-                    ):
-                        openai_params = {
-                            "api_key": openai_api_key,
-                            "max_tokens": openai_max_tokens,
-                            "temperature": openai_temperature,
-                            "max_retries": openai_max_retries,
-                            "default_model": openai_default_model,
-                        }
-                        params["openai_params"] = openai_params
-                        config_manager.save_params(params)
-                        st.success("OpenAI parameters saved!")
+                        on_click=save_openai_params,
+                    )
 
         # --------------------------- Claude AI Parameters --------------------------- #
         elif ai_provider == "claude":

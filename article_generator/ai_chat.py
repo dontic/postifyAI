@@ -248,9 +248,17 @@ class AI:
 
                 if attempt == self.max_retries:
                     log.error("Max retries reached for API errors.")
+
+                    # Handle overloaded API
+                    if "529" in str(e):
+                        return (
+                            "",
+                            "Max retries reached for API errors. Anthropic API seems to be overloaded right now, please try again later.",
+                        )
+
                     return (
                         "",
-                        "Max retries reached for API errors. Claude might be overloaded. Please check that your Claude API key is correct.",
+                        "Max retries reached for API errors. Please check that your Claude API key is correct.",
                     )
 
                 log.warning("API error. Retrying...")

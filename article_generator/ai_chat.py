@@ -29,8 +29,10 @@ class AI:
         self.ai_provider = self.config_manager.load_params()["ai_provider"]
 
         if self.ai_provider == "openai":
+            log.debug("AI provider: OpenAI")
             self.openai_init(system_prompt)
         elif self.ai_provider == "claude":
+            log.debug("AI provider: Claude")
             self.claude_init(system_prompt)
         else:
             raise ValueError("Invalid AI provider")
@@ -135,6 +137,7 @@ class AI:
                     )
 
                 log.warning("API error. Retrying...")
+                log.debug(e)
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -247,10 +250,11 @@ class AI:
                     log.error("Max retries reached for API errors.")
                     return (
                         "",
-                        "Max retries reached for API errors. Please check that your Claude API key is correct.",
+                        "Max retries reached for API errors. Claude might be overloaded. Please check that your Claude API key is correct.",
                     )
 
                 log.warning("API error. Retrying...")
+                log.debug(e)
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 

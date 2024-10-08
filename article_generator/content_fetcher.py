@@ -21,7 +21,7 @@ def fetch_content(url: str) -> str:
         else:
             content_body = ""
     except Exception as e:
-        log.warn(f"Failed to fetch content from {url}: {e}")
+        log.warning(f"Failed to fetch content from {url}: {e}")
         content_body = ""
 
     return content_body

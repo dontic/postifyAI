@@ -21,6 +21,9 @@ def main():
         layout="wide",
     )
 
+    # Load the prompts
+    prompts = config_manager.load_prompts()
+
     # -------------------- Initialize session state variables -------------------- #
     if "show_openai_params" not in st.session_state:
         st.session_state.show_openai_params = False
@@ -50,6 +53,19 @@ def main():
             int: The index of the AI provider in the list
         """
         return ai_provider_list.index(ai_provider)
+
+    def get_article_type_index(article_type: str, article_types: list[str]) -> int:
+        """
+        Get the index of the article type in the list
+
+        Args:
+            article_type (str): The article type to get the index of
+            article_types (list[str]): The list of article types
+
+        Returns:
+            int: The index of the article type in the list
+        """
+        return article_types.index(article_type)
 
     # --------------------------------- Callbacks -------------------------------- #
     def save_article_params():
@@ -126,11 +142,18 @@ def main():
                 value=article_params.get("language"),
                 disabled=st.session_state.generating,
             )
+            # Load article types
+            article_types = list(prompts.keys())
             st.selectbox(
-                "Type of article (More options coming soon)",
-                ["guide"],
+                "Type of article",
+                article_types,
+                format_func=lambda x: prompts.get(x).get("name"),
                 key="article_type",
-                index=0,
+                index=(
+                    get_article_type_index(
+                        article_params.get("article_type"), article_types
+                    )
+                ),
                 disabled=st.session_state.generating,
             )
             st.text_input(

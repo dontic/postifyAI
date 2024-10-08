@@ -29,8 +29,10 @@ class AI:
         self.ai_provider = self.config_manager.load_params()["ai_provider"]
 
         if self.ai_provider == "openai":
+            log.debug("AI provider: OpenAI")
             self.openai_init(system_prompt)
         elif self.ai_provider == "claude":
+            log.debug("AI provider: Claude")
             self.claude_init(system_prompt)
         else:
             raise ValueError("Invalid AI provider")
@@ -109,7 +111,7 @@ class AI:
                     log.error("Max retries reached for rate limit.")
                     return "", "Max retries reached for rate limit."
 
-                log.warn("Rate limit error. Retrying...")
+                log.warning("Rate limit error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -120,7 +122,7 @@ class AI:
                     log.error("Max retries reached for connection errors.")
                     return "", "Max retries reached for connection errors."
 
-                log.warn("API connection error. Retrying...")
+                log.warning("API connection error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -134,7 +136,8 @@ class AI:
                         "Max retries reached for API errors. Please check that your OpenAI API key is correct.",
                     )
 
-                log.warn("API error. Retrying...")
+                log.warning("API error. Retrying...")
+                log.debug(e)
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -225,7 +228,7 @@ class AI:
                     log.error("Max retries reached for rate limit.")
                     return "", "Max retries reached for rate limit."
 
-                log.warn("Rate limit error. Retrying...")
+                log.warning("Rate limit error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -236,7 +239,7 @@ class AI:
                     log.error("Max retries reached for connection errors.")
                     return "", "Max retries reached for connection errors."
 
-                log.warn("API connection error. Retrying...")
+                log.warning("API connection error. Retrying...")
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 
@@ -245,12 +248,21 @@ class AI:
 
                 if attempt == self.max_retries:
                     log.error("Max retries reached for API errors.")
+
+                    # Handle overloaded API
+                    if "529" in str(e):
+                        return (
+                            "",
+                            "Max retries reached for API errors. Anthropic API seems to be overloaded right now, please try again later.",
+                        )
+
                     return (
                         "",
                         "Max retries reached for API errors. Please check that your Claude API key is correct.",
                     )
 
-                log.warn("API error. Retrying...")
+                log.warning("API error. Retrying...")
+                log.debug(e)
                 delay = retry_delay * (2**attempt)
                 time.sleep(delay)
 

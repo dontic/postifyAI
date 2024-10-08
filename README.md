@@ -32,7 +32,7 @@ The tool will be available at `http://localhost:8501`
 If you want to make your parameters and settings persistent, you can mount a volume:
 
 ```bash
-docker run -p 8501:8501 -v postifyai_data:/app/data postifyai:latest
+docker run -p 8501:8501 -v postifyai_data:/app/data dontic/postifyai:latest
 ```
 
 #### How to Update postifyAI

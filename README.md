@@ -1,9 +1,14 @@
-<img src="demo/assets/logo.svg" height="50">
+<img src="demo/assets/logo.svg" width="450">
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Latest version](https://img.shields.io/github/v/release/dontic/postifyai
-)](https://github.com/dontic/postifyAI/releases/tag/1.0.0)
+)](https://github.com/dontic/postifyAI/releases)
+[![Issues](https://img.shields.io/github/issues/dontic/postifyai)](https://github.com/dontic/postifyAI/issues)
+[![Docker Pulls](https://img.shields.io/docker/pulls/dontic/postifyai
+)](https://hub.docker.com/r/dontic/postifyai)
 
+
+
+Blog articles created for you in minutes.
 
 **Save hundreds of content creation hours** with a __self contained__ & __fully automated__ AI tool for writing SEO oriented blog articles.
 
@@ -12,8 +17,8 @@
 ## Get started
 ### Self Hosted
 
-You need to have API access to:
-- OpenAI or Claude
+You will need to have API keys for:
+- Either OpenAI or Anthropic
 - SerpAPI
 
 You can then deploy the tool locally with docker:
@@ -24,28 +29,40 @@ docker run -p 8501:8501 dontic/postifyai:latest
 
 The tool will be available at `http://localhost:8501`
 
+If you want to make your parameters and settings persistent, you can mount a volume:
+
+```bash
+docker run -p 8501:8501 -v postifyai_data:/app/data postifyai:latest
+```
+
+#### How to Update postifyAI
+
+> Stay updated with the latest features and improvements by watching the repository.
+
+To update the tool after a release, you can pull the latest image:
+
+```bash
+docker pull dontic/postifyai:latest
+```
+
 ---
-<img src="demo/assets/logo-cloud.svg" height="50">
+<a href="https://postifyai.com"
+target="_blank">
+    <img src="demo/assets/logo-cloud.svg" width="450">
+</a>
 
-Have a ready-to-use version of postifyAI:
-
-- Just sign up and start generating articles
-- Create each article in less than 4 minutes
-- Hosted in the cloud
-- No API keys required
-- Personalized domain: `yourname.postifyai.com`
-
-
-> ℹ️ Send an email to [hey@postifyai.com](mailto:hey@postifyai.com) to request early access.
-
-
-
+[Postify has a PRO version](https://postifyai.com) for teams and businesses. It includes:
+- No setup required
+- Unlimited articles
+- Web text editor
+- History of generated articles
+- Collaboration features
+- Publish directly to your favorite CMS
+- Priority support
 
 
-## Contributing
+## Feature requests & Bug reports
 
-Feel free to open issues for any bugs or feature requests.
+[Open an issue](https://github.com/dontic/postifyAI/issues) to submit a feature request or report a bug.
 
-
-## License
-Distributed under the MIT License. See [LICENSE](https://github.com/dontic/postifyAI/blob/main/LICENSE) for more information.
+Please do make sure to [check if the issue has already been reported](https://github.com/dontic/postifyAI/issues) before opening a new one.
